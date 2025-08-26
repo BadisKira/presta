@@ -1,88 +1,110 @@
 pipeline {
     agent any
+
     environment {
-        DOCKER_HOST = 'tcp://localhost:2375'
-        BACKEND_DIR = 'jenkinsTest'
-        IMAGE_NAME  = 'backend-app'
-        CONTAINER_NAME = 'backend-app'
+        IMAGE_NAME      = 'backend-app-image'
+        CONTAINER_NAME  = 'backend-app-container'
     }
+
     stages {
-        stage("verify tooling") {
+        stage("Checkout") {
             steps {
-                bat '''
+                sh '''
+                    echo "🔧 Checking installed tools..."
                     docker version
                     docker info
-                    docker-compose version
+                    docker compose version
                     curl --version
                     jq --version
                 '''
             }
         }
 
+        // Compilation du projet Spring Boot
         stage('Build Backend') {
             steps {
-                echo 'Building...'
-                dir("${env.BACKEND_DIR}") {
-                    bat '''
-                        dir
-                        mvnw.cmd clean package -DskipTests
-                    '''
+                echo '🏗️ Building the backend application...'
+                sh './mvnw clean package -DskipTests'
+            }
+        }
+
+        // Tests unitaires et tests d'intégration en parallèle
+        stage('Run Tests') {
+            parallel {
+                stage('Unit Tests') {
+                    steps {
+                        echo '🧪 Running unit tests...'
+                        sh './mvnw test -Dtest=*Test*'
+                    }
+                }
+
+                stage('Integration Tests') {
+                    steps {
+                        echo '🧪 Running integration tests...'
+                        sh './mvnw verify -Dtest=*IT*'
+                    }
                 }
             }
         }
 
-        stage('Unit Tests with Testcontainers') {
-            steps {
-                echo 'Testing...'
-                dir("${env.BACKEND_DIR}") {
-                    bat '''
-                        mvnw.cmd test
-                    '''
-                }
-            }
-        }
-
+        // Construction de l'image Docker
         stage("Build Docker Image") {
             steps {
-                script {
-                    echo "🔨 Building Docker image..."
-                    def appImage = docker.build("${IMAGE_NAME}:${env.BUILD_NUMBER}", "${BACKEND_DIR}")
-                    bat "docker tag ${IMAGE_NAME}:${env.BUILD_NUMBER} ${IMAGE_NAME}:latest"
-                }
+                echo "🐳 Building Docker image..."
+                sh """
+                    docker build -t ${IMAGE_NAME}:latest .
+                """
             }
         }
 
+
+        // Lancement du container Docker pour tests API
         stage("Run Container") {
             steps {
-                script {
-                    echo "🚀 Starting container..."
-                    bat "docker run -d -p 8081:8081 --name ${CONTAINER_NAME} ${IMAGE_NAME}:latest"
-                }
+                echo "🚀 Starting Docker container..."
+                sh "docker run -d -p 9000:8080 --name ${CONTAINER_NAME} ${IMAGE_NAME}:latest"
             }
         }
 
+        // Test des endpoints API
         stage("Test API") {
             steps {
+                echo "🔍 Testing API endpoints..."
                 script {
-                    echo "🧪 Running API test..."
                     try {
-                        bat 'curl -f http://localhost:8081/employees | jq'
+                        sh 'curl -f http://localhost:9000/api/products | jq'
                     } catch (Exception e) {
                         error("❌ API endpoint returned a non-200 status code.")
                     }
                 }
             }
         }
+
+
+        stage("Push Docker Image") {
+            steps {
+                script {
+                    withCredentials([usernamePassword(credentialsId: 'badiskuikops', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                        sh """
+                            echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
+                            docker tag ${IMAGE_NAME}:latest ${DOCKER_USER}/${IMAGE_NAME}:latest
+                            docker push ${DOCKER_USER}/${IMAGE_NAME}:latest
+                            docker logout
+                        """
+                    }
+                }
+            }
+        }
     }
+    // Nettoyage des ressources Docker utilisées par Jenkins
     post {
         always {
-            script {
-                echo "🧹 Cleaning up only Jenkins-related Docker resources..."
-                bat "docker stop ${CONTAINER_NAME} || exit 0"
-                bat "docker rm ${CONTAINER_NAME} || exit 0"
-                bat "docker rmi ${IMAGE_NAME}:${env.BUILD_NUMBER} || exit 0"
-                bat "docker rmi ${IMAGE_NAME}:latest || exit 0"
-            }
+            echo "🧹 Cleaning up Docker resources..."
+            sh '''
+                docker stop ${CONTAINER_NAME} || true
+                docker rm ${CONTAINER_NAME} || true
+                docker rmi ${IMAGE_NAME}:latest || true
+            '''
         }
     }
 }
