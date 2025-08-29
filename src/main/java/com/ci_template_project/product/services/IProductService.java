@@ -2,6 +2,7 @@ package com.ci_template_project.product.services;
 
 
 
+import com.ci_template_project.product.models.Product;
 import com.ci_template_project.product.models.dtos.ProductDto;
 
 import java.util.List;
@@ -23,4 +24,7 @@ public interface IProductService {
      * @throws RuntimeException si le produit n'existe pas
      */
     ProductDto getProductById(Long id);
+
+
+    Product createProduct(ProductDto productDto);
 }
