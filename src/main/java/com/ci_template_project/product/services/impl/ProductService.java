@@ -6,6 +6,8 @@ import com.ci_template_project.product.models.dtos.ProductDto;
 import com.ci_template_project.product.services.IProductService;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -31,6 +33,15 @@ public class ProductService implements IProductService {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Product not found with id: " + id));
         return convertToDto(product);
+    }
+
+    @Override
+    public Product createProduct(ProductDto productDto) {
+        Product p = new Product();
+        p.setName(productDto.name());
+        p.setDescription(productDto.description());
+        p.setPrice(productDto.price());
+        return productRepository.save(p);
     }
 
     private ProductDto convertToDto(Product product) {
