@@ -23,7 +23,7 @@ pipeline {
         // Compilation du projet Spring Boot
         stage('Build Backend') {
             steps {
-                echo '🏗️ Building the backend application...'
+                echo 'Building the backend application...'
                 sh './mvnw clean package -DskipTests'
             }
         }
@@ -62,23 +62,44 @@ pipeline {
         stage("Run Container") {
             steps {
                 echo "🚀 Starting Docker container..."
-                sh "docker run -d -p 9000:8080 --name ${CONTAINER_NAME} ${IMAGE_NAME}:latest"
+                sh "docker run -d -p 9001:8080 --name ${CONTAINER_NAME} ${IMAGE_NAME}:latest"
             }
         }
 
-        // Test des endpoints API
-        stage("Test API") {
-            steps {
-                echo "🔍 Testing API endpoints..."
-                script {
-                    try {
-                        sh 'curl -f http://localhost:9000/api/products | jq'
-                    } catch (Exception e) {
-                        error("❌ API endpoint returned a non-200 status code.")
-                    }
-                }
-            }
-        }
+               // Test des endpoints API
+               stage("Test API") {
+                   steps {
+                       echo "🔍 Testing API endpoints..."
+                       script {
+                           try {
+                               // Attente que l'API réponde avant de tester
+                               sh '''
+                                   echo "⏳ Waiting for API to be ready..."
+                                   for i in {1..15}; do
+                                       if curl -s http://localhost:9001/actuator/health | grep -q '"status":"UP"'; then
+                                           echo "✅ API is UP"
+                                           break
+                                       fi
+                                       echo "⏳ API not ready yet... retrying in 5s"
+                                       sleep 5
+                                   done
+                               '''
+
+                               // Test des endpoints principaux
+                               sh '''
+                                   echo "🔎 Testing /api/products..."
+                                   curl -f http://localhost:9001/api/products | jq
+
+                                   echo "🔎 Testing /api/otherEndpoint..."
+                                   curl -f http://localhost:9001/api/otherEndpoint | jq
+                               '''
+                           } catch (Exception e) {
+                               error("❌ API endpoints are not responding correctly.")
+                           }
+                       }
+                   }
+               }
+
 
 
         stage("Push Docker Image") {
