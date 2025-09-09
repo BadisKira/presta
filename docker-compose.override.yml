@@ -1,0 +1,11 @@
+services:
+  frontend:
+    build:
+      context: ./presta-client
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ./client-front-end:/app
+      - /app/node_modules
+    command: npm run start
+    ports:
+      - "4200:4200"

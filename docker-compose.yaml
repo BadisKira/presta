@@ -36,17 +36,16 @@ services:
 #    ports:
 #      - "8080:8080"
 
-#  frontend:
-#    container_name: frontend
-#    depends_on:
-#      - backend
-#    build:
-#      context: ./front/.
-#    networks:
-#      - instalite
-#    ports:
-#      - "5173:3000"
 
+  frontend:
+    depends_on:
+      - backend
+    build:
+      context: ./presta-client/.
+    networks:
+      - presta-network
+    ports:
+      - "4200:80"
 
   adminer:
     container_name: presta-adminer
