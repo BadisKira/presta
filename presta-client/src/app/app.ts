@@ -1,6 +1,6 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { ProductService } from './service/product-service';
+import { ProductService } from './services/product/product-service';
 
 @Component({
   selector: 'app-root',
