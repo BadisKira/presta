@@ -1,9 +1,9 @@
-package com.ci_template_project.product.service;
+package com.presta.product.service;
 
-import com.ci_template_project.product.daos.ProductRepository;
-import com.ci_template_project.product.models.Product;
-import com.ci_template_project.product.models.dtos.ProductDto;
-import com.ci_template_project.product.services.impl.ProductService;
+import com.presta.product.daos.ProductRepository;
+import com.presta.product.models.Product;
+import com.presta.product.models.dtos.ProductDto;
+import com.presta.product.services.impl.ProductService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;

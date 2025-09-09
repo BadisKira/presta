@@ -1,7 +1,7 @@
-package com.ci_template_project.product.controllers;
+package com.presta.product.controllers;
 
-import com.ci_template_project.product.models.dtos.ProductDto;
-import com.ci_template_project.product.services.IProductService;
+import com.presta.product.models.dtos.ProductDto;
+import com.presta.product.services.IProductService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

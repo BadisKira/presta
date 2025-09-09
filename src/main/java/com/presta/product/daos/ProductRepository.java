@@ -1,6 +1,6 @@
-package com.ci_template_project.product.daos;
+package com.presta.product.daos;
 
-import com.ci_template_project.product.models.Product;
+import com.presta.product.models.Product;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

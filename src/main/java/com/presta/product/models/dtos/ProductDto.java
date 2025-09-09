@@ -1,4 +1,4 @@
-package com.ci_template_project.product.models.dtos;
+package com.presta.product.models.dtos;
 
 
 import java.math.BigDecimal;

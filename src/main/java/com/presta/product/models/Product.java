@@ -1,4 +1,4 @@
-package com.ci_template_project.product.models;
+package com.presta.product.models;
 
 
 import jakarta.persistence.*;

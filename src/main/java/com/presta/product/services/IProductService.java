@@ -1,9 +1,9 @@
-package com.ci_template_project.product.services;
+package com.presta.product.services;
 
 
 
-import com.ci_template_project.product.models.Product;
-import com.ci_template_project.product.models.dtos.ProductDto;
+import com.presta.product.models.Product;
+import com.presta.product.models.dtos.ProductDto;
 
 import java.util.List;
 

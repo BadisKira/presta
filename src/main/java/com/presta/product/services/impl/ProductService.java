@@ -1,9 +1,9 @@
-package com.ci_template_project.product.services.impl;
+package com.presta.product.services.impl;
 
-import com.ci_template_project.product.daos.ProductRepository;
-import com.ci_template_project.product.models.Product;
-import com.ci_template_project.product.models.dtos.ProductDto;
-import com.ci_template_project.product.services.IProductService;
+import com.presta.product.daos.ProductRepository;
+import com.presta.product.models.Product;
+import com.presta.product.models.dtos.ProductDto;
+import com.presta.product.services.IProductService;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;

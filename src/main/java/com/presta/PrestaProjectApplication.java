@@ -1,13 +1,13 @@
-package com.ci_template_project;
+package com.presta;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class CiTemplateProjectApplication {
+public class PrestaProjectApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(CiTemplateProjectApplication.class, args);
+		SpringApplication.run(PrestaProjectApplication.class, args);
 	}
 
 }

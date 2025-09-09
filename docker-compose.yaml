@@ -1,6 +1,6 @@
 services:
   db:
-    container_name: ci-template-backend
+    container_name: presta-db
     image: "postgres:16-alpine3.21"
     healthcheck:
       test: [ "CMD", "pg_isready", "-q", "-d", "postgres", "-U", "root" ]
@@ -8,13 +8,13 @@ services:
       interval: 10s
       retries: 10
     volumes:
-      - ci-template-db-data:/var/lib/postgresql/data
+      - presta-db-data:/var/lib/postgresql/data
     environment:
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: admin
-      POSTGRES_DB: ci-template-db
+      POSTGRES_DB: presta-db
     networks:
-      - ci-template-network
+      - presta-network
     ports:
       - "5432:5432"
 
@@ -49,20 +49,20 @@ services:
 
 
   adminer:
-    container_name: ci-template-adminer
+    container_name: presta-adminer
     image: adminer
     restart: always
     ports:
       - "8081:8080"
     networks:
-      - ci-template-network
+      - presta-network
     depends_on:
       - db
 
 
 networks:
-  ci-template-network:
+  presta-network:
     driver: bridge
 
 volumes:
-  ci-template-db-data:
+  presta-db-data:
