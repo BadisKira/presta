@@ -1,16 +1,16 @@
 import { TestBed } from '@angular/core/testing';
 
-import { ProductService } from '../product-service';
+import { ProductService } from '../product-assignment';
 
 describe('ProductService', () => {
-  let service: ProductService;
+  let assignment: ProductService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
-    service = TestBed.inject(ProductService);
+    assignment = TestBed.inject(ProductService);
   });
 
   it('should be created', () => {
-    expect(service).toBeTruthy();
+    expect(assignment).toBeTruthy();
   });
 });

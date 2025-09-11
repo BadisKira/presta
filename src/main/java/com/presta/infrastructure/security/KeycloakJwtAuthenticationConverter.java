@@ -1,4 +1,4 @@
-package com.presta.config.security;
+package com.presta.infrastructure.security;
 
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.lang.NonNull;
@@ -15,8 +15,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import static java.util.stream.Collectors.toSet;
 
 public class KeycloakJwtAuthenticationConverter implements Converter<Jwt ,  AbstractAuthenticationToken> {
     @Override

@@ -1,8 +1,9 @@
 spring:
-  oauth2:
-    resourceserver:
-      jwt:
-        issuer-uri: "http://localhost:9090/realms/presta-realm"
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: "http://localhost:9090/realms/presta-realm"
   application:
     name: presta
 
@@ -34,7 +35,8 @@ springdoc:
     path: /
 
 flyway:
-  enabled: true
-  validate-on-migrate: true
+  schemas: presta
+  default-schema: presta
+  baseline-on-migrate: true
 
 

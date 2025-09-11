@@ -3,14 +3,14 @@ import { TestBed } from '@angular/core/testing';
 import { Keycloak } from './keycloak';
 
 describe('Keycloak', () => {
-  let service: Keycloak;
+  let assignment: Keycloak;
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
-    service = TestBed.inject(Keycloak);
+    assignment = TestBed.inject(Keycloak);
   });
 
   it('should be created', () => {
-    expect(service).toBeTruthy();
+    expect(assignment).toBeTruthy();
   });
 });

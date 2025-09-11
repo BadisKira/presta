@@ -9,6 +9,8 @@ services:
       retries: 10
     volumes:
       - presta-db-data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+
     environment:
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: admin
@@ -37,15 +39,15 @@ services:
 #      - "8080:8080"
 
 
-  frontend:
-#    depends_on:
-#      - backend
-    build:
-      context: ./presta-client/.
-    networks:
-      - presta-network
-    ports:
-      - "4200:80"
+#  frontend:
+##    depends_on:
+##      - backend
+#    build:
+#      context: ./presta-client/.
+#    networks:
+#      - presta-network
+#    ports:
+#      - "4200:80"
 
   adminer:
     container_name: presta-adminer
@@ -66,10 +68,22 @@ services:
     environment:
       KEYCLOAK_ADMIN: admin
       KEYCLOAK_ADMIN_PASSWORD: admin
+      KC_DB: postgres
+      KC_DB_URL_HOST: db
+      KC_DB_URL_DATABASE: presta-db
+      KC_DB_USERNAME: admin
+      KC_DB_PASSWORD: admin
+      KC_DB_SCHEMA: keycloak
+    volumes:
+      - ./realm-export.json:/opt/keycloak/data/realm-export.json
     command:
-      - "start-dev"
+      - start-dev
+      - --import-realm
     networks:
       - presta-network
+    depends_on:
+      - db
+
 
 
 networks:
