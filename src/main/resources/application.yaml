@@ -1,0 +1,40 @@
+spring:
+  oauth2:
+    resourceserver:
+      jwt:
+        issuer-uri: "http://localhost:9090/realms/presta-realm"
+  application:
+    name: presta
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/presta-db
+    username: admin
+    password: admin
+    name: presta-db
+
+  jpa:
+    show-sql: true
+    generate-ddl: true
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 100MB
+
+  # profiles:
+  #   active: dev
+
+springdoc:
+  swagger-ui:
+    path: /
+
+flyway:
+  enabled: true
+  validate-on-migrate: true
+
+

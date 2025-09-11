@@ -11,8 +11,8 @@
 	<groupId>com</groupId>
 	<artifactId>presta-project</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>ci-template-project</name>
-	<description>Demo project for Spring Boot</description>
+	<name>presta-project</name>
+	<description>Mini projet kuikops</description>
 	<url/>
 	<licenses>
 		<license/>
@@ -72,7 +72,18 @@
 			<artifactId>postgresql</artifactId>
 			<scope>test</scope>
 		</dependency>
-	</dependencies>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+
+    </dependencies>
 
 	<build>
 		<plugins>

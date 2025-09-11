@@ -38,8 +38,8 @@ services:
 
 
   frontend:
-    depends_on:
-      - backend
+#    depends_on:
+#      - backend
     build:
       context: ./presta-client/.
     networks:
