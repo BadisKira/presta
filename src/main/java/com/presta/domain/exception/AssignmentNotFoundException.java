@@ -1,4 +1,4 @@
-package com.presta.domain.exceptions;
+package com.presta.domain.exception;
 
 
 import java.util.UUID;

@@ -1,9 +1,9 @@
-package com.presta.infrastructure.adapter;
+package com.presta.infrastructure.persistence.adapters;
 
-import com.presta.domain.models.Assignment;
-import com.presta.domain.port.out.AssignmentRepository;
-import com.presta.infrastructure.entities.AssignmentEntity;
-import com.presta.infrastructure.repositories.JpaAssignmentRepository;
+import com.presta.domain.model.Assignment;
+import com.presta.domain.port.out.AssignmentPort;
+import com.presta.infrastructure.persistence.entities.AssignmentEntity;
+import com.presta.infrastructure.persistence.repositories.JpaAssignmentRepository;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 
 @Repository
 @Transactional
-public class AssignmentRepositoryAdapter implements AssignmentRepository {
+public class AssignmentRepositoryAdapter implements AssignmentPort {
 
     private final JpaAssignmentRepository jpaRepo;
 

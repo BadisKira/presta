@@ -1,4 +1,4 @@
-package com.presta.infrastructure.security;
+package com.presta.infrastructure.external.security;
 
 
 import org.springframework.context.annotation.Bean;

@@ -1,4 +1,4 @@
-package com.presta.infrastructure.security;
+package com.presta.infrastructure.external.security;
 
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.lang.NonNull;

@@ -1,4 +1,4 @@
-package com.presta.infrastructure.entities;
+package com.presta.infrastructure.persistence.entities;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

@@ -11,8 +11,8 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
         "com.presta.infrastructure",
         "com.presta.application"
 })
-@EnableJpaRepositories("com.presta.infrastructure.repositories")
-@EntityScan("com.presta.infrastructure.entities")
+@EnableJpaRepositories("com.presta.infrastructure.persistence.repositories")
+@EntityScan("com.presta.infrastructure.persistence.entities")
 public class PrestaProjectApplication {
 
 	public static void main(String[] args) {

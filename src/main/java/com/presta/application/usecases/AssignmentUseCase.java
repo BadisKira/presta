@@ -1,39 +1,41 @@
 package com.presta.application.usecases;
 
-import com.presta.domain.exceptions.AssignmentNotFoundException;
-import com.presta.domain.models.Assignment;
-import com.presta.domain.port.out.AssignmentRepository;
+import com.presta.domain.exception.AssignmentNotFoundException;
+import com.presta.domain.model.Assignment;
+import com.presta.domain.port.out.AssignmentPort;
+import org.springframework.stereotype.Component;
+
 import java.util.List;
 import java.util.UUID;
 
-@org.springframework.stereotype.Service
+@Component
 public class AssignmentUseCase {
 
-    private final AssignmentRepository assignmentRepository;
+    private final AssignmentPort assignmentPort;
 
-    public AssignmentUseCase(AssignmentRepository assignmentRepository) {
-        this.assignmentRepository = assignmentRepository;
+    public AssignmentUseCase(AssignmentPort assignmentPort) {
+        this.assignmentPort = assignmentPort;
     }
 
     public Assignment createService(String name, String description) {
         UUID id = UUID.randomUUID();
         Assignment assignment = new Assignment(id, name, description);
-        return assignmentRepository.save(assignment);
+        return assignmentPort.save(assignment);
     }
 
     public Assignment getService(UUID id) {
-        return assignmentRepository.findById(id).orElseThrow(() -> new AssignmentNotFoundException(id));
+        return assignmentPort.findById(id).orElseThrow(() -> new AssignmentNotFoundException(id));
     }
 
     public List<Assignment> listServices() {
-        return assignmentRepository.findAll();
+        return assignmentPort.findAll();
     }
 
     public void deleteService(UUID id) {
         // Optionally verify existence first
-        if (assignmentRepository.findById(id).isEmpty()) {
+        if (assignmentPort.findById(id).isEmpty()) {
             throw new AssignmentNotFoundException(id);
         }
-        assignmentRepository.deleteById(id);
+        assignmentPort.deleteById(id);
     }
 }

@@ -6,13 +6,10 @@ CREATE TABLE presta.userApp (
     email VARCHAR(100) UNIQUE NOT NULL
 );
 
-
-CREATE TABLE presta.accountClient (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    user_app_id UUID UNIQUE NOT NULL,
-    FOREIGN KEY (user_app_id) REFERENCES presta.userApp(id) ON DELETE CASCADE
+CREATE TABLE presta.clientAccount (
+    id UUID PRIMARY KEY,
+    FOREIGN KEY (id) REFERENCES presta.userApp(id) ON DELETE CASCADE
 );
-
 
 CREATE TABLE presta.assignment (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -20,15 +17,13 @@ CREATE TABLE presta.assignment (
     description TEXT
 );
 
-
+-- Table Contractor avec même ID que User
 CREATE TABLE presta.contractorAccount (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    user_app_id UUID UNIQUE NOT NULL,
+    id UUID PRIMARY KEY,
     full_name VARCHAR(150),
     address TEXT,
     assignment_id UUID,
     speciality VARCHAR(100),
-    FOREIGN KEY (user_app_id) REFERENCES presta.userApp(id) ON DELETE CASCADE,
+    FOREIGN KEY (id) REFERENCES presta.userApp(id) ON DELETE CASCADE,
     FOREIGN KEY (assignment_id) REFERENCES presta.assignment(id) ON DELETE SET NULL
 );
-
