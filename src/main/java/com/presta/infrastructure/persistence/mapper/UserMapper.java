@@ -52,7 +52,8 @@ public class UserMapper {
         return new ContractorEntity(
                 contractor.id(),
                 contractor.fullName(),
-                contractor.address().getFormattedAddress(),
+                "L'adresse que tu dois modifier le code",
+                //contractor.address().getFormattedAddress(),
                 contractor.assignmentId(),
                 contractor.speciality()
         );

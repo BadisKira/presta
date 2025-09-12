@@ -7,7 +7,7 @@ import com.presta.domain.model.valueobject.UserProfile;
 import java.util.List;
 import java.util.Optional;
 
-public interface UserAuthentificationPort {
+public interface UserAuthenticationPort {
 
     record AuthenticatedUser(
             KeycloakUserId keycloakId,

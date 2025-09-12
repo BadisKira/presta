@@ -13,6 +13,8 @@ public interface UserSyncPort {
         }
 
         void syncUser(UserProfile profile, ContactInfo contact, List<UserRole> roles);
+        void syncUser(KeycloakUserId keycloakUserId,UserProfile profile, ContactInfo contact, List<UserRole> roles);
+
         boolean userExists(KeycloakUserId keycloakId);
 
 }
