@@ -1,0 +1,16 @@
+ <p-button 
+      *ngIf="!isLoggedIn"
+      label="Se connecter" 
+      icon="pi pi-sign-in"
+      (onClick)="login()"
+      [loading]="loading">
+    </p-button>
+
+    <p-button 
+      *ngIf="isLoggedIn"
+      label="Se déconnecter" 
+      icon="pi pi-sign-out"
+      severity="danger"
+      (onClick)="logout()"
+      [loading]="loading">
+    </p-button>

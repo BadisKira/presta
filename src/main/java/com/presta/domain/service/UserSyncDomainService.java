@@ -69,7 +69,7 @@ public class UserSyncDomainService implements UserSyncPort {
             userRepositoryPort.saveContractor(contractor);
         }
 
-        // Règle métier : Validation des rôles
+
         if (roles.contains(UserRole.CLIENT) && roles.contains(UserRole.CONTRACTOR)) {
             throw new IllegalArgumentException("Un utilisateur ne peut pas être à la fois CLIENT et CONTRACTOR");
         }

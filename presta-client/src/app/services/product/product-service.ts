@@ -7,7 +7,7 @@ import { HttpClient } from '@angular/common/http';
 export class ProductService {
 
   private http = inject(HttpClient);
-  private apiUrl = 'http://localhost:8080/api/products';
+  private apiUrl = 'http://localhost:8080/api/assignments';
 
   getProducts() {
     this.http.get(this.apiUrl).subscribe({

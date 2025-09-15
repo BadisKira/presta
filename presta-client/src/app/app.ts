@@ -1,6 +1,6 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { ProductService } from './services/product/product-assignment';
+import { KeycloakService } from './services/keycloak/keycloak';
 
 @Component({
   selector: 'app-root',
@@ -10,10 +10,11 @@ import { ProductService } from './services/product/product-assignment';
 })
 export class App implements OnInit {
   protected readonly title = signal('presta-client');
-  private productService = inject(ProductService);
-
-
+  private keycloakService = inject(KeycloakService);
+  
   ngOnInit(): void {
-      console.log("Bonjour le constructor de APP")
-      this.productService.getProducts();  }
+    if(this.keycloakService.isLoggedIn()){
+      this.keycloakService.syncUserWithBackend();
+    }
+  }
 }

@@ -3,6 +3,8 @@ import { inject } from '@angular/core';
 import { KeycloakService } from '../keycloak/keycloak';
 
 export const httpTokenInterceptor: HttpInterceptorFn = (req, next) => {
+
+
   const tokenService = inject(KeycloakService);
   const token = tokenService.keycloak.token;
   if (token) {

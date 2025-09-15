@@ -4,16 +4,14 @@ import com.presta.domain.port.in.UserSyncPort;
 import com.presta.domain.port.out.UserAuthenticationPort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
 
 @RestController
 @RequestMapping("/api/users")
+@CrossOrigin("*")
 public class UserController {
 
     private final UserSyncPort userSyncPort;
@@ -24,9 +22,10 @@ public class UserController {
         this.authPort = authPort;
     }
 
-    @PostMapping("/sync")
-    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/sync")
+//    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<String> testSync() {
+        System.out.println("Je suis dans la méthode de sync");
         var authUser = authPort.getCurrentAuthenticatedUser()
                 .orElseThrow(() -> new SecurityException("Not authenticated"));
 
