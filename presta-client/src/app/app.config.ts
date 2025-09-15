@@ -8,6 +8,9 @@ import { httpTokenInterceptor } from './services/interceptor/http-token-intercep
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { providePrimeNG } from 'primeng/config';
 import Aura from '@primeuix/themes/aura';
+import { errorInterceptor } from './services/interceptor/error-interceptor';
+import { provideAnimations } from '@angular/platform-browser/animations';
+import { MessageService } from 'primeng/api';
 
 export function kcFactory(keycloakService: KeycloakService) {
   return () => keycloakService.init();
@@ -18,7 +21,7 @@ export const appConfig: ApplicationConfig = {
     provideZonelessChangeDetection(),
     provideRouter(routes),
     provideHttpClient(withInterceptors([
-      httpTokenInterceptor
+      httpTokenInterceptor,errorInterceptor
     ])),
      {
       provide: APP_INITIALIZER,
@@ -31,6 +34,8 @@ export const appConfig: ApplicationConfig = {
       theme:{
         preset: Aura
       }
-    })
+    }),
+    provideAnimations(),
+    MessageService
   ]
 };

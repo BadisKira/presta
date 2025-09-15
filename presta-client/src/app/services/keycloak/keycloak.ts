@@ -2,6 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import Keycloak from 'keycloak-js';
 import { UserProfile } from '../../models/user-profile';
 import { HttpClient } from '@angular/common/http';
+import { MessageService } from 'primeng/api';
 
 @Injectable({
   providedIn: 'root'
@@ -11,6 +12,8 @@ export class KeycloakService {
   private _keycloak: Keycloak | undefined;
   private http = inject(HttpClient);
   private _urlSyncUser = "http://localhost:8080/api/users/sync";
+  private messageService = inject(MessageService)
+
 
   get keycloak() {
     if (!this._keycloak) {
@@ -51,8 +54,8 @@ export class KeycloakService {
   }
 
   logout() {
-    // this.keycloak.accountManagement();
-    return this.keycloak.logout({ redirectUri: 'http://localhost:4200' });
+    localStorage.removeItem("userSynced");
+    return this.keycloak.logout({ redirectUri: 'http://localhost:4200' })
   }
 
   isLoggedIn(): boolean {
@@ -68,27 +71,30 @@ export class KeycloakService {
 
 
   async syncUserWithBackend(): Promise<boolean> {
-    if (!this.keycloak.token) {
-      console.log("Sync with backend but no token ")
-      return false;
-    }
-    
-
-    if (localStorage.getItem("userSynced")) {
+    if (!this.keycloak.token || localStorage.getItem("userSynced")) {
       return false;
     }
 
     let tentative = 0;
     const maxTentatives = 3;
-    
+
     while (tentative < maxTentatives) {
       tentative++;
-      
+
       try {
-        const response = await this.http.get(this._urlSyncUser).toPromise();
-        localStorage.setItem("userSynced", "true");
+        const response = await this.http.get(this._urlSyncUser, {
+          responseType: 'text'
+        }).toPromise();
+
+
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Synchronisation réussie',
+          detail: response
+        });
+
         return true;
-        
+
       } catch (error: any) {
         if (tentative === maxTentatives) {
           this.handleSyncError(error);
@@ -98,7 +104,7 @@ export class KeycloakService {
         await this.wait(delai);
       }
     }
-    
+
     return false;
   }
 
@@ -113,6 +119,11 @@ export class KeycloakService {
    * Gestion des erreurs de sync
    */
   private handleSyncError(error: any): void {
+
+    console.log('This is not an error ', error);
+    if (error.status < 400) {
+      return;
+    }
     if (error.status === 401) {
       console.error('Token invalide ou expiré');
     } else if (error.status === 500) {

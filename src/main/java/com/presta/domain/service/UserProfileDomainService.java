@@ -1,5 +1,7 @@
 package com.presta.domain.service;
 
+import com.presta.domain.exception.ContractorProfileIncompleteException;
+import com.presta.domain.exception.UserNotFoundException;
 import com.presta.domain.model.Contractor;
 import com.presta.domain.model.User;
 import com.presta.domain.model.valueobject.ContactInfo;
@@ -25,7 +27,7 @@ public class UserProfileDomainService implements UserProfilePort {
     @Override
     public void updateUserProfile(KeycloakUserId keycloakId, UserProfile profile, ContactInfo contact) {
         User user = userRepositoryPort.findUserByKeycloakId(keycloakId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found: " + keycloakId));
+                .orElseThrow(() -> new UserNotFoundException(keycloakId.getValue()));
 
         // Règle métier : Mise à jour immutable des Value Objects
         User updatedUser = user.updateProfile(profile).updateContactInfo(contact);
@@ -44,18 +46,18 @@ public class UserProfileDomainService implements UserProfilePort {
 
         // Règle métier : Vérifier si c'est un contractor avec profil complet
         Optional<Contractor> contractor = userRepositoryPort.findContractorById(user.id());
-        if (contractor.isPresent()) {
-            return validateContractorProfile(contractor.get());
-        }
+        return contractor.map(this::validateContractorProfile).orElse(true);
 
         // Pour un client, le profil User suffit
-        return true;
     }
 
     private boolean validateContractorProfile(Contractor contractor) {
-        // Règle métier : Un contractor doit avoir adresse et spécialité pour être complet
-       // return contractor.address().isPresent() && contractor.speciality().isPresent();
-
+        //        boolean complete = contractor.address(). && contractor.speciality().isEmpty();
+        //        if (!complete) {
+        //            throw new ContractorProfileIncompleteException();
+        //        }
+        //        return true;
         return false;
+
     }
 }

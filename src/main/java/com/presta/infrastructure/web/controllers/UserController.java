@@ -23,14 +23,10 @@ public class UserController {
     }
 
     @GetMapping("/sync")
-//    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<String> testSync() {
-        System.out.println("Je suis dans la méthode de sync");
         var authUser = authPort.getCurrentAuthenticatedUser()
                 .orElseThrow(() -> new SecurityException("Not authenticated"));
-
-        System.out.println("Auth user profile " +authUser);
-
 
         userSyncPort.syncUser(
                 authUser.keycloakId(),

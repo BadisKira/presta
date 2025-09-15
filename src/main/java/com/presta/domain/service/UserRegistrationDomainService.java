@@ -1,5 +1,6 @@
 package com.presta.domain.service;
 
+import com.presta.domain.exception.UserAlreadyExistsException;
 import com.presta.domain.model.Client;
 import com.presta.domain.model.Contractor;
 import com.presta.domain.model.User;
@@ -19,16 +20,14 @@ public class UserRegistrationDomainService implements UserRegistrationPort {
 
     @Override
     public void registerUser(KeycloakUserId keycloakId, UserProfile profile, ContactInfo contact, UserRole role) {
-        // Règle métier : Vérifier que l'utilisateur n'existe pas déjà
         if (userRepositoryPort.findUserByKeycloakId(keycloakId).isPresent()) {
-            throw new IllegalStateException("User already exists with Keycloak ID: " + keycloakId);
+            throw new UserAlreadyExistsException(keycloakId.getValue());
         }
 
         // Créer l'utilisateur de base
         User user = User.create(keycloakId, profile, contact);
         User savedUser = userRepositoryPort.saveUser(user);
 
-        // Règle métier : Créer le compte spécifique selon le rôle
         createRoleBasedAccount(savedUser, role);
     }
 
