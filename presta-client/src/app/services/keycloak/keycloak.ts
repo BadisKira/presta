@@ -82,7 +82,7 @@ export class KeycloakService {
       tentative++;
 
       try {
-        const response = await this.http.get(this._urlSyncUser, {
+        const response = await this.http.get(this._urlSyncUser + `?role=${localStorage.getItem("role")}`, {
           responseType: 'text'
         }).toPromise();
 

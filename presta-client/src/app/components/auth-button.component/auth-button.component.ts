@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, input, OnInit } from '@angular/core';
 import {ButtonModule} from "primeng/button";
 import { KeycloakService } from '../../services/keycloak/keycloak';
 import { CommonModule } from '@angular/common';
@@ -11,6 +11,8 @@ import { CommonModule } from '@angular/common';
 export class AuthButtonComponent implements OnInit {
   isLoggedIn = false;
   loading = false;
+
+  role = input.required<'CLIENT' | 'CONTRACTOR'>();
 
   constructor(private keycloakService: KeycloakService) {}
 

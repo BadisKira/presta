@@ -17,21 +17,21 @@ public class AssignmentUseCase {
         this.assignmentPort = assignmentPort;
     }
 
-    public Assignment createService(String name, String description) {
+    public Assignment createAssignment(String name, String description) {
         UUID id = UUID.randomUUID();
         Assignment assignment = new Assignment(id, name, description);
         return assignmentPort.save(assignment);
     }
 
-    public Assignment getService(UUID id) {
+    public Assignment getAssignment(UUID id) {
         return assignmentPort.findById(id).orElseThrow(() -> new AssignmentNotFoundException(id));
     }
 
-    public List<Assignment> listServices() {
+    public List<Assignment> listAssignments() {
         return assignmentPort.findAll();
     }
 
-    public void deleteService(UUID id) {
+    public void deleteAssignment(UUID id) {
         // Optionally verify existence first
         if (assignmentPort.findById(id).isEmpty()) {
             throw new AssignmentNotFoundException(id);

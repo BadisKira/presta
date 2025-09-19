@@ -22,23 +22,23 @@ public class AssignmentController {
 
     @GetMapping
     public List<Assignment> list() {
-        return assignmentUseCase.listServices();
+        return assignmentUseCase.listAssignments();
     }
 
     @GetMapping("/{id}")
     public Assignment getOne(@PathVariable UUID id) {
-        return assignmentUseCase.getService(id);
+        return assignmentUseCase.getAssignment(id);
     }
 
     @PostMapping
     public ResponseEntity<Assignment> create(@RequestBody CreateAssignmentRequest request) {
-        Assignment created = assignmentUseCase.createService(request.name(), request.description());
+        Assignment created = assignmentUseCase.createAssignment(request.name(), request.description());
         return ResponseEntity.created(URI.create("/api/assignments/" + created.id())).body(created);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable UUID id) {
-        assignmentUseCase.deleteService(id);
+        assignmentUseCase.deleteAssignment(id);
         return ResponseEntity.noContent().build();
     }
 }

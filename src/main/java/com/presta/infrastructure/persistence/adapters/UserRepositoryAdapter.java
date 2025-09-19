@@ -178,13 +178,13 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
             contractorEntity.setUser(userEntity);
         }
 
-
-        AssignmentEntity assignmentEntity = new AssignmentEntity();
-
-        assignmentEntity.setId(contractor.assignment().id());
-        assignmentEntity.setName(contractor.assignment().name());
-        assignmentEntity.setDescription(contractor.assignment().description());
-
+        AssignmentEntity assignmentEntity =null ;
+        if(contractor.assignment() != null) {
+            assignmentEntity = new AssignmentEntity();
+            assignmentEntity.setId(contractor.assignment().id());
+            assignmentEntity.setName(contractor.assignment().name());
+            assignmentEntity.setDescription(contractor.assignment().description());
+        }
 
 
         contractorEntity.setFullName(contractor.fullName());
@@ -199,8 +199,6 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
         }
 
         entityManager.flush();
-
-
         return toDomainContractor(contractorEntity);
     }
 
@@ -282,13 +280,21 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
     }
 
     private Contractor toDomainContractor(ContractorEntity entity) {
+
+        Assignment assignment =null ;
+        if(entity.getAssignment() != null) {
+            assignment =  new Assignment(entity.getAssignment().getId(),entity.getAssignment().getName(),entity.getAssignment().getDescription()) ;
+        }
+
+
+
         User user = toDomainUser(entity.getUser());
         return Contractor.create(
                 entity.getId(),
                 user,
                 entity.getFullName(),
-                entity.getAddress(),
-                new Assignment(entity.getAssignment().getId(),entity.getAssignment().getName(),entity.getAssignment().getDescription()),
+                entity.getAddress(),assignment
+               ,
                 entity.getSpeciality()
         );
     }

@@ -1,8 +1,16 @@
 <p>
-    Narrruto Home page mon fils
+  Home Page  - Select do you want to be a client or you want to be a contractor  
 </p>
 
-<app-auth-button></app-auth-button>
+<button (click)="changeRole('CONTRACTOR')">
+ CONTRACTOR
+</button>
+
+<button (click)="changeRole('CLIENT')">
+ CLIENT
+</button>
+
+<app-auth-button [role]="role()"></app-auth-button>
 
 
 

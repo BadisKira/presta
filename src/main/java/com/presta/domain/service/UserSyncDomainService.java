@@ -72,7 +72,7 @@ public class UserSyncDomainService implements UserSyncPort {
 
         if (roles.contains(UserRole.CONTRACTOR)) {
             Contractor contractor = Contractor.create(user.id(),user,
-                    "kaka pepe", "Adresse vide pour l'instant", null, null);
+                    "", "", null, null);
             Contractor c = userRepositoryPort.saveContractor(contractor);
         }
 
