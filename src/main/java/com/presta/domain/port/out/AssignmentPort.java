@@ -11,4 +11,5 @@ public interface AssignmentPort {
     Optional<Assignment> findById(UUID id);
     List<Assignment> findAll();
     void deleteById(UUID id);
+    boolean exists(UUID id);
 }

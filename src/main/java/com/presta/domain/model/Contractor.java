@@ -8,7 +8,7 @@ public record Contractor(
         User user,
         String fullName,
         String address,
-        UUID assignmentId,
+        Assignment assignment,
         String speciality
 ) {
     public Contractor {
@@ -24,7 +24,19 @@ public record Contractor(
     }
 
     public static Contractor create(UUID id, User user, String fullName, String address,
-                                    UUID assignmentId, String speciality) {
-        return new Contractor(id, user, fullName, address, assignmentId, speciality);
+                                    Assignment assignment, String speciality) {
+        return new Contractor(id, user, fullName, address, assignment, speciality);
+    }
+
+
+    public Contractor chooseAssignment(Assignment assignment){
+        return  new Contractor(
+                this.id(),
+                this.user(),
+                this.fullName(),
+                this.address(),
+                assignment,
+                this.speciality()
+        );
     }
 }

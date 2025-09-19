@@ -1,5 +1,6 @@
 package com.presta.infrastructure.persistence.mapper.user;
 
+import com.presta.domain.model.Assignment;
 import com.presta.domain.model.Client;
 import com.presta.domain.model.Contractor;
 import com.presta.domain.model.User;
@@ -57,17 +58,19 @@ public class UserMapper {
     // ===== CONTRACTOR MAPPING =====
 
     public ContractorEntity toEntity(Contractor contractor) {
-        AssignmentEntity assignment = null;
-        if (contractor.assignmentId() != null) {
-            assignment = new AssignmentEntity();
-            assignment.setId(contractor.assignmentId());
+        AssignmentEntity assignmentEntity = null;
+        if (contractor.assignment() != null) {
+            assignmentEntity = new AssignmentEntity();
+            assignmentEntity.setId(contractor.assignment().id());
+            assignmentEntity.setName(contractor.assignment().name());
+            assignmentEntity.setDescription(contractor.assignment().description());
         }
 
         ContractorEntity contractorEntity = new ContractorEntity();
         contractorEntity.setId(contractor.id());
         contractorEntity.setFullName(contractor.fullName());
         contractorEntity.setAddress(contractor.address());
-        contractorEntity.setAssignment(assignment);
+        contractorEntity.setAssignment(assignmentEntity);
         contractorEntity.setSpeciality(contractor.speciality());
 
         if (contractor.user() != null) {
@@ -78,12 +81,21 @@ public class UserMapper {
     }
 
     public Contractor toDomain(ContractorEntity entity) {
+
+        Assignment assignment = null;
+        if(entity.getAssignment() != null) {
+            assignment = new Assignment(
+                    entity.getAssignment().getId(),
+                    entity.getAssignment().getName(),
+                    entity.getAssignment().getDescription());
+        }
+
         return new Contractor(
                 entity.getId(),
                 entity.getUser() != null ? toDomain(entity.getUser()) : null,
                 entity.getFullName(),
                 entity.getAddress(),
-                entity.getAssignmentId(),
+                assignment,
                 entity.getSpeciality()
         );
     }

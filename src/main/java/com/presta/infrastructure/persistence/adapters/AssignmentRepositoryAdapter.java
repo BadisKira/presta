@@ -61,4 +61,9 @@ public class AssignmentRepositoryAdapter implements AssignmentPort {
     public void deleteById(UUID id) {
         jpaRepo.deleteById(id);
     }
+
+    @Override
+    public boolean exists(UUID id) {
+        return jpaRepo.existsById(id);
+    }
 }

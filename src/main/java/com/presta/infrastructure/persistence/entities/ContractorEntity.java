@@ -14,7 +14,7 @@ public class ContractorEntity {
     private UUID id;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @MapsId  // Partage l'ID avec UserEntity
+    @MapsId
     @JoinColumn(name = "id")
     private UserEntity user;
 

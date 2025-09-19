@@ -1,5 +1,6 @@
 package com.presta.infrastructure.persistence.adapters;
 
+import com.presta.domain.model.Assignment;
 import com.presta.domain.model.Client;
 import com.presta.domain.model.Contractor;
 import com.presta.domain.model.User;
@@ -7,6 +8,7 @@ import com.presta.domain.model.valueobject.ContactInfo;
 import com.presta.domain.model.valueobject.KeycloakUserId;
 import com.presta.domain.model.valueobject.UserProfile;
 import com.presta.domain.port.out.UserRepositoryPort;
+import com.presta.infrastructure.persistence.entities.AssignmentEntity;
 import com.presta.infrastructure.persistence.entities.ClientEntity;
 import com.presta.infrastructure.persistence.entities.ContractorEntity;
 import com.presta.infrastructure.persistence.entities.UserEntity;
@@ -176,9 +178,18 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
             contractorEntity.setUser(userEntity);
         }
 
+
+        AssignmentEntity assignmentEntity = new AssignmentEntity();
+
+        assignmentEntity.setId(contractor.assignment().id());
+        assignmentEntity.setName(contractor.assignment().name());
+        assignmentEntity.setDescription(contractor.assignment().description());
+
+
+
         contractorEntity.setFullName(contractor.fullName());
         contractorEntity.setAddress(contractor.address());
-        contractorEntity.setAssignment(null);
+        contractorEntity.setAssignment(assignmentEntity);
         contractorEntity.setSpeciality(contractor.speciality());
 
         if (contractorExists) {
@@ -255,7 +266,6 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
         entity.setFirstName(user.profile().getFirstName());
         entity.setLastName(user.profile().getLastName());
         entity.setEmail(user.contactInfo().email());
-        // Note: on ne change PAS l'ID lors d'un update
     }
 
     private User toDomainUser(UserEntity entity) {
@@ -278,7 +288,7 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
                 user,
                 entity.getFullName(),
                 entity.getAddress(),
-                entity.getAssignmentId(),
+                new Assignment(entity.getAssignment().getId(),entity.getAssignment().getName(),entity.getAssignment().getDescription()),
                 entity.getSpeciality()
         );
     }

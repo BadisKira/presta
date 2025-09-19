@@ -70,9 +70,6 @@ public class UserSyncDomainService implements UserSyncPort {
             userRepositoryPort.saveClient(client);
         }
 
-        System.out.println(user);
-        System.out.println(roles.get(0));
-
         if (roles.contains(UserRole.CONTRACTOR)) {
             Contractor contractor = Contractor.create(user.id(),user,
                     "kaka pepe", "Adresse vide pour l'instant", null, null);

@@ -14,7 +14,7 @@ spring:
     name: presta-db
 
   jpa:
-    show-sql: true
+    show-sql: false
     generate-ddl: false
     hibernate:
       ddl-auto: validate
