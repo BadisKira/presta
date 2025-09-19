@@ -6,7 +6,7 @@ public class UserProfile {
     private final String firstName;
     private final String lastName;
 
-    private UserProfile(String firstName, String lastName) {
+    public UserProfile(String firstName, String lastName) {
         this.firstName = validateName(firstName, "First name");
         this.lastName = validateName(lastName, "Last name");
     }

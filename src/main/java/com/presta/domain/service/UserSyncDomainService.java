@@ -8,6 +8,7 @@ import com.presta.domain.model.valueobject.KeycloakUserId;
 import com.presta.domain.model.valueobject.UserProfile;
 import com.presta.domain.port.in.UserSyncPort;
 import com.presta.domain.port.out.UserRepositoryPort;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -49,24 +50,33 @@ public class UserSyncDomainService implements UserSyncPort {
         userRepositoryPort.saveUser(updatedUser);
     }
 
-    private void createNewUser(KeycloakUserId keycloakId, UserProfile profile, ContactInfo contact, List<UserRole> roles) {
-        // Créer l'utilisateur de base
-        User newUser = User.create(keycloakId, profile, contact);
-        User savedUser = userRepositoryPort.saveUser(newUser);
 
-        // Règle métier : Créer les comptes selon les rôles
-        createRoleSpecificAccounts(savedUser, roles);
+    private void createNewUser(KeycloakUserId keycloakId, UserProfile profile, ContactInfo contact, List<UserRole> roles) {
+        try{
+            User newUser = User.create(keycloakId, profile, contact);
+            User savedUser = userRepositoryPort.saveUser(newUser);
+            createRoleSpecificAccounts(savedUser, roles);
+        } catch (RuntimeException e) {
+            System.out.println("**************************************");
+            System.out.println(e.getMessage());
+            throw new RuntimeException(e);
+        }
+
     }
 
     private void createRoleSpecificAccounts(User user, List<UserRole> roles) {
         if (roles.contains(UserRole.CLIENT)) {
-            Client client = Client.create(user.id());
+            Client client = Client.create(user.id(),user);
             userRepositoryPort.saveClient(client);
         }
 
+        System.out.println(user);
+        System.out.println(roles.get(0));
+
         if (roles.contains(UserRole.CONTRACTOR)) {
-            Contractor contractor = Contractor.create(user.id(), null, null, null, null);
-            userRepositoryPort.saveContractor(contractor);
+            Contractor contractor = Contractor.create(user.id(),user,
+                    "kaka pepe", "Adresse vide pour l'instant", null, null);
+            Contractor c = userRepositoryPort.saveContractor(contractor);
         }
 
 

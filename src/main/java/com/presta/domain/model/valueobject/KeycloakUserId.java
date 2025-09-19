@@ -6,7 +6,7 @@ import java.util.UUID;
 public class KeycloakUserId {
     private final UUID value;
 
-    private KeycloakUserId(UUID value) {
+    public KeycloakUserId(UUID value) {
         this.value = Objects.requireNonNull(value, "KeycloakUserId cannot be null");
     }
 

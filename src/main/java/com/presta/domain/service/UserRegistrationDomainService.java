@@ -24,7 +24,6 @@ public class UserRegistrationDomainService implements UserRegistrationPort {
             throw new UserAlreadyExistsException(keycloakId.getValue());
         }
 
-        // Créer l'utilisateur de base
         User user = User.create(keycloakId, profile, contact);
         User savedUser = userRepositoryPort.saveUser(user);
 
@@ -34,11 +33,11 @@ public class UserRegistrationDomainService implements UserRegistrationPort {
     private void createRoleBasedAccount(User user, UserRole role) {
         switch (role) {
             case CLIENT -> {
-                Client client = Client.create(user.id());
+                Client client = Client.create(user.id(),user);
                 userRepositoryPort.saveClient(client);
             }
             case CONTRACTOR -> {
-                Contractor contractor = Contractor.create(user.id(), null, null, null, null);
+                Contractor contractor = Contractor.create(user.id(),user, null, null, null, null);
                 userRepositoryPort.saveContractor(contractor);
             }
         }

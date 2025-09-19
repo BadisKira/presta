@@ -1,4 +1,4 @@
-package com.presta.infrastructure.persistence.repositories;
+package com.presta.infrastructure.persistence.repositories.user;
 
 import com.presta.infrastructure.persistence.entities.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;

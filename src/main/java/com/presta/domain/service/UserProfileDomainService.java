@@ -2,6 +2,7 @@ package com.presta.domain.service;
 
 import com.presta.domain.exception.ContractorProfileIncompleteException;
 import com.presta.domain.exception.UserNotFoundException;
+import com.presta.domain.model.Client;
 import com.presta.domain.model.Contractor;
 import com.presta.domain.model.User;
 import com.presta.domain.model.valueobject.ContactInfo;
@@ -9,6 +10,8 @@ import com.presta.domain.model.valueobject.KeycloakUserId;
 import com.presta.domain.model.valueobject.UserProfile;
 import com.presta.domain.port.in.UserProfilePort;
 import com.presta.domain.port.out.UserRepositoryPort;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.Optional;
 
@@ -44,7 +47,6 @@ public class UserProfileDomainService implements UserProfilePort {
 
         User user = userOpt.get();
 
-        // Règle métier : Vérifier si c'est un contractor avec profil complet
         Optional<Contractor> contractor = userRepositoryPort.findContractorById(user.id());
         return contractor.map(this::validateContractorProfile).orElse(true);
 
@@ -60,4 +62,5 @@ public class UserProfileDomainService implements UserProfilePort {
         return false;
 
     }
+
 }

@@ -1,4 +1,4 @@
-package com.presta.infrastructure.web.controllers;
+package com.presta.infrastructure.web.controllers.user;
 
 import com.presta.domain.port.in.UserSyncPort;
 import com.presta.domain.port.out.UserAuthenticationPort;
@@ -11,7 +11,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/users")
-@CrossOrigin("*")
 public class UserController {
 
     private final UserSyncPort userSyncPort;
@@ -24,7 +23,7 @@ public class UserController {
 
     @GetMapping("/sync")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<String> testSync() {
+    public ResponseEntity<String> syncUsers() {
         var authUser = authPort.getCurrentAuthenticatedUser()
                 .orElseThrow(() -> new SecurityException("Not authenticated"));
 
@@ -53,4 +52,8 @@ public class UserController {
                 "roles", authUser.roles()
         ));
     }
+
+
+
+
 }

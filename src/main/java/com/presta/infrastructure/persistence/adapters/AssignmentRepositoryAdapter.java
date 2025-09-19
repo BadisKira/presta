@@ -3,7 +3,7 @@ package com.presta.infrastructure.persistence.adapters;
 import com.presta.domain.model.Assignment;
 import com.presta.domain.port.out.AssignmentPort;
 import com.presta.infrastructure.persistence.entities.AssignmentEntity;
-import com.presta.infrastructure.persistence.repositories.JpaAssignmentRepository;
+import com.presta.infrastructure.persistence.repositories.assignment.JpaAssignmentRepository;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 

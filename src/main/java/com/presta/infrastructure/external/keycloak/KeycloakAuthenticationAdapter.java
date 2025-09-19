@@ -59,7 +59,7 @@ public class KeycloakAuthenticationAdapter implements UserAuthenticationPort {
             // Extraction des rôles métier
             List<String> roles = jwtExtractor.extractBusinessRoles(jwt);
 
-            // ✅ CORRECTION : Nom complet avec le port
+
             return Optional.of(new UserAuthenticationPort.AuthenticatedUser(keycloakId, profile, contact, roles));
 
         } catch (Exception e) {

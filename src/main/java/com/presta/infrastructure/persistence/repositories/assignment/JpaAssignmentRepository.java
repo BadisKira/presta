@@ -1,4 +1,4 @@
-package com.presta.infrastructure.persistence.repositories;
+package com.presta.infrastructure.persistence.repositories.assignment;
 
 import com.presta.infrastructure.persistence.entities.AssignmentEntity;
 import org.springframework.data.jpa.repository.JpaRepository;

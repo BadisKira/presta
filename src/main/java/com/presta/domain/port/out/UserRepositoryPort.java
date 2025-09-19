@@ -4,6 +4,8 @@ import com.presta.domain.model.Client;
 import com.presta.domain.model.Contractor;
 import com.presta.domain.model.User;
 import com.presta.domain.model.valueobject.KeycloakUserId;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -23,4 +25,9 @@ public interface UserRepositoryPort {
 
     Contractor saveContractor(Contractor contractor);
     Optional<Contractor> findContractorById(UUID id);
+
+
+    Page<Contractor> findContractors(String name, String speciality, Pageable pageable);
+    Page<Client> findClients(String name, Pageable pageable);
+
 }

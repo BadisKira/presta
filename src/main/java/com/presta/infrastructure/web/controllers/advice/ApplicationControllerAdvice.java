@@ -1,4 +1,4 @@
-package com.presta.infrastructure.web.controllers;
+package com.presta.infrastructure.web.controllers.advice;
 
 
 import com.presta.domain.exception.DomainException;
