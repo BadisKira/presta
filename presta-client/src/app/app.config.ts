@@ -1,5 +1,5 @@
 import { APP_INITIALIZER, ApplicationConfig, provideBrowserGlobalErrorListeners, provideZonelessChangeDetection } from '@angular/core';
-import { provideRouter } from '@angular/router';
+import { provideRouter, withEnabledBlockingInitialNavigation, withInMemoryScrolling } from '@angular/router';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 
 import { routes } from './app.routes';
@@ -19,20 +19,22 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideZonelessChangeDetection(),
-    provideRouter(routes),
+    //provideRouter(routes),
+    provideRouter(routes, withInMemoryScrolling({ anchorScrolling: 'enabled', scrollPositionRestoration: 'enabled' }), withEnabledBlockingInitialNavigation()),
     provideHttpClient(withInterceptors([
       httpTokenInterceptor,errorInterceptor
     ])),
-     {
-      provide: APP_INITIALIZER,
-      useFactory: kcFactory,
-      deps: [KeycloakService],
-      multi: true
-    },
+    //  {
+    //   provide: APP_INITIALIZER,
+    //   useFactory: kcFactory,
+    //   deps: [KeycloakService],
+    //   multi: true
+    // },
     provideAnimationsAsync(),
     providePrimeNG({
       theme:{
-        preset: Aura
+        preset: Aura,
+        options: { darkModeSelector: '.app-dark' } 
       }
     }),
     provideAnimations(),

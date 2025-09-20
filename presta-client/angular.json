@@ -22,7 +22,7 @@
               }
             ],
             "styles": [
-              "src/styles.css"
+              "src/app/assets/styles.scss"
             ]
           },
           "configurations": {
@@ -75,11 +75,22 @@
               }
             ],
             "styles": [
-              "src/styles.css"
+              "node_modules/primeng/resources/themes/lara-light-blue/theme.css",
+              "node_modules/primeng/resources/primeng.min.css",
+              "node_modules/primeicons/primeicons.css",
+              "src/app/assets/styles.scss"
             ]
           }
         }
       }
     }
+  },
+  "schematics": {
+    "@schematics/angular:component": {
+      "style": "scss"
+    }
+  },
+  "cli": {
+    "analytics": false
   }
 }

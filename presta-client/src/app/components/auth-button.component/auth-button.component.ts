@@ -6,7 +6,7 @@ import { CommonModule } from '@angular/common';
   selector: 'app-auth-button',
   imports: [ButtonModule,CommonModule],
   templateUrl: './auth-button.component.html',
-  styleUrl: './auth-button.component.css'
+  styleUrl: './auth-button.component.scss'
 })
 export class AuthButtonComponent implements OnInit {
   isLoggedIn = false;
