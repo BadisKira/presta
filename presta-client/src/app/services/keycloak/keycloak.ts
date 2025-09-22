@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import Keycloak from 'keycloak-js';
-import { UserProfile } from '../../models/user-profile';
+import { UserProfile } from '../../models/user.model';
 import { HttpClient } from '@angular/common/http';
 import { MessageService } from 'primeng/api';
 

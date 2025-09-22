@@ -1,0 +1,79 @@
+import { HttpClient } from '@angular/common/http';
+import { inject, Injectable } from '@angular/core';
+import { Assignment } from '../../models/assignment';
+import { environment } from '../../../environment';
+
+
+
+type CreateAssignmentRequest = {
+  name:string,
+  description: string
+}
+
+@Injectable({
+  providedIn: 'root'
+})
+export class AssignemntService {
+  private http = inject(HttpClient);
+  private _url_base=environment.apiUrl + '/api/assignments';
+
+  listAssignements(){
+    const data = this.http.get("https://jsonplaceholder.typicode.com/posts")
+    return data;
+  }
+  
+}
+
+
+
+
+/**
+ * 
+ * 
+ 
+package com.presta.infrastructure.web.controllers.assignment;
+
+import com.presta.application.usecases.AssignmentUseCase;
+import com.presta.domain.model.Assignment;
+import com.presta.infrastructure.web.dtos.assignment.CreateAssignmentRequest;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.net.URI;
+import java.util.List;
+import java.util.UUID;
+
+@RestController
+@RequestMapping("/api/assignments")
+public class AssignmentController {
+
+    private final AssignmentUseCase assignmentUseCase;
+
+    public AssignmentController(AssignmentUseCase assignmentUseCase) {
+        this.assignmentUseCase = assignmentUseCase;
+    }
+
+    @GetMapping
+    public List<Assignment> list() {
+        return assignmentUseCase.listAssignments();
+    }
+
+    @GetMapping("/{id}")
+    public Assignment getOne(@PathVariable UUID id) {
+        return assignmentUseCase.getAssignment(id);
+    }
+
+    @PostMapping
+    public ResponseEntity<Assignment> create(@RequestBody CreateAssignmentRequest request) {
+        Assignment created = assignmentUseCase.createAssignment(request.name(), request.description());
+        return ResponseEntity.created(URI.create("/api/assignments/" + created.id())).body(created);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable UUID id) {
+        assignmentUseCase.deleteAssignment(id);
+        return ResponseEntity.noContent().build();
+    }
+}
+
+ */
