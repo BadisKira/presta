@@ -32,7 +32,7 @@ import { LayoutService } from './layout.service';
                         />
                     </g>
                 </svg>
-                <span>SAKAI</span>
+                <span>PrestaDZ</span>
             </a>
         </div>
 
@@ -42,7 +42,7 @@ import { LayoutService } from './layout.service';
                     <i [ngClass]="{ 'pi ': true, 'pi-moon': layoutService.isDarkTheme(), 'pi-sun': !layoutService.isDarkTheme() }"></i>
                 </button>
                 <div class="relative">
-                    <button
+                    <!-- <button
                         class="layout-topbar-action layout-topbar-action-highlight"
                         pStyleClass="@next"
                         enterFromClass="hidden"
@@ -52,31 +52,23 @@ import { LayoutService } from './layout.service';
                         [hideOnOutsideClick]="true"
                     >
                         <i class="pi pi-palette"></i>
-                    </button>
+                    </button> -->
                     <!-- <app-configurator /> -->
                 </div>
             </div>
 
-            <button class="layout-topbar-menu-button layout-topbar-action" pStyleClass="@next" enterFromClass="hidden" enterActiveClass="animate-scalein" leaveToClass="hidden" leaveActiveClass="animate-fadeout" [hideOnOutsideClick]="true">
+            <!-- <button class="layout-topbar-menu-button layout-topbar-action" pStyleClass="@next" enterFromClass="hidden" enterActiveClass="animate-scalein" leaveToClass="hidden" leaveActiveClass="animate-fadeout" [hideOnOutsideClick]="true">
                 <i class="pi pi-ellipsis-v"></i>
-            </button>
+            </button> -->
 
-            <div class="layout-topbar-menu hidden lg:block">
+            <!-- <div class="layout-topbar-menu hidden lg:block">
                 <div class="layout-topbar-menu-content">
-                    <button type="button" class="layout-topbar-action">
-                        <i class="pi pi-calendar"></i>
-                        <span>Calendar</span>
-                    </button>
-                    <button type="button" class="layout-topbar-action">
-                        <i class="pi pi-inbox"></i>
-                        <span>Messages</span>
-                    </button>
                     <button type="button" class="layout-topbar-action">
                         <i class="pi pi-user"></i>
                         <span>Profile</span>
                     </button>
                 </div>
-            </div>
+            </div> -->
         </div>
     </div>`
 })

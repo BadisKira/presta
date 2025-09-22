@@ -39,3 +39,6 @@ export interface UpdateUserDto {
 export interface UpdatePasswordDto {
   newPassword: string;
 }
+
+
+export type UserRoles = "ADMIN" | "CLIENT" | "CONTRACTOR" ;

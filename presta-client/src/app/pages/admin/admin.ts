@@ -14,18 +14,7 @@ import { AppFooter } from '../../layout/app.footer';
     RouterModule,
     AppFooter
   ],
-  template: `<div class="layout-wrapper" [ngClass]="containerClass">
-        <app-topbar></app-topbar>
-        <app-sidebar></app-sidebar>
-        <div class="layout-main-container">
-            <div class="layout-main">
-                <p>je suis dans la layout admin zihahaha</p>
-                <router-outlet></router-outlet>
-            </div>
-            <app-footer></app-footer>
-        </div>
-        <div class="layout-mask animate-fadein"></div>
-    </div> `
+  templateUrl:'./admin.html'
 })
 export class AdminLayout {
   overlayMenuOpenSubscription: Subscription;
