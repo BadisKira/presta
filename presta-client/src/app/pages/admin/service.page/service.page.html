@@ -1,0 +1,180 @@
+<!-- Toolbar -->
+<p-toolbar styleClass="mb-6">
+    <ng-template pTemplate="start">
+        <p-button label="New" icon="pi pi-plus" severity="secondary" class="mr-2" (onClick)="openNew()" />
+    </ng-template>
+
+    <ng-template pTemplate="end">
+        <p-button label="Refresh" icon="pi pi-refresh" severity="secondary" class="mr-2" (onClick)="refreshData()" />
+        <p-button label="Export" icon="pi pi-upload" severity="secondary" (onClick)="exportCSV()" />
+    </ng-template>
+</p-toolbar>
+
+<!-- Table avec pagination côté serveur -->
+<p-table
+    #dt
+    [value]="assignments()"
+    [rows]="pageSize"
+    [columns]="cols"
+    [paginator]="true"
+    [lazy]="true"
+    [totalRecords]="totalRecords()"
+    [loading]="loading()"
+    (onLazyLoad)="onPageChange($event)"
+    [globalFilterFields]="['name', 'description']"
+    [tableStyle]="{ 'min-width': '75rem' }"
+    [(selection)]="selectedAssignments"
+    [rowHover]="true"
+    dataKey="id"
+    currentPageReportTemplate="Affichage de {first} à {last} sur {totalRecords} assignments"
+    [showCurrentPageReport]="true"
+    [rowsPerPageOptions]="[5, 10, 20, 50]"
+    [sortField]="sortField"
+    [sortOrder]="sortOrder === 'asc' ? 1 : -1"
+    (onSort)="onSort($event)"
+>
+    <ng-template pTemplate="caption">
+        <div class="flex items-center justify-between">
+            <h5 class="m-0">Gérer les assignments</h5>
+            <div class="flex gap-2">
+                <p-iconfield>
+                    <p-inputicon styleClass="pi pi-search" />
+                    <input pInputText type="text" 
+                           [value]="searchTerm"
+                           (input)="onGlobalFilter(dt, $event)" 
+                           placeholder="Recherche par nom..." />
+                </p-iconfield>
+                <p-button icon="pi pi-times" 
+                          severity="secondary" 
+                          [outlined]="true"
+                          (onClick)="clearSearch()"
+                          [disabled]="!searchTerm"
+                          pTooltip="Effacer la recherche" />
+            </div>
+        </div>
+    </ng-template>
+
+    <ng-template pTemplate="header">
+        <tr>
+            <th style="width: 3rem">
+                <p-tableHeaderCheckbox />
+            </th>
+            <th pSortableColumn="name" style="min-width:16rem">
+                Nom
+                <p-sortIcon field="name" />
+            </th>
+            <th pSortableColumn="description" style="min-width:20rem">
+                Description
+                <p-sortIcon field="description" />
+            </th>
+            <th style="min-width: 12rem">Actions</th>
+        </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-assignment>
+        <tr>
+            <td style="width: 3rem">
+                <p-tableCheckbox [value]="assignment" />
+            </td>
+            <td style="min-width: 12rem">{{ assignment?.name || 'N/A' }}</td>
+            <td style="min-width: 16rem">{{ assignment?.description || 'N/A' }}</td>
+            <td>
+                <p-button icon="pi pi-pencil" 
+                          class="mr-2" 
+                          [rounded]="true" 
+                          [outlined]="true" 
+                          (click)="openEditDialog(assignment)"
+                          pTooltip="Modifier" />
+                <p-button icon="pi pi-trash" 
+                          severity="danger" 
+                          [rounded]="true" 
+                          [outlined]="true" 
+                          (click)="openDeleteDialogConfirmation(assignment)"
+                          pTooltip="Supprimer" />
+            </td>
+        </tr>
+    </ng-template>
+
+    <ng-template pTemplate="emptymessage">
+        <tr>
+            <td colspan="4" class="text-center p-4">
+                <div *ngIf="loading(); else noData">
+                    <i class="pi pi-spin pi-spinner" style="font-size: 2rem"></i>
+                    <p>Chargement des assignments...</p>
+                </div>
+                <ng-template #noData>
+                    <i class="pi pi-info-circle" style="font-size: 2rem; color: #6c757d;"></i>
+                    <p>Aucun assignment trouvé</p>
+                    <p-button label="Créer un assignment" 
+                              icon="pi pi-plus" 
+                              (onClick)="openNew()"
+                              [text]="true" />
+                </ng-template>
+            </td>
+        </tr>
+    </ng-template>
+
+    <ng-template pTemplate="loadingbody">
+        <tr>
+            <td colspan="4">
+                <div class="flex align-items-center justify-content-center p-4">
+                    <i class="pi pi-spin pi-spinner mr-2"></i>
+                    Chargement...
+                </div>
+            </td>
+        </tr>
+    </ng-template>
+</p-table>
+
+<!-- Dialog de création/modification -->
+<p-dialog [(visible)]="assignmentDialog" 
+          [style]="{ width: '450px' }" 
+          [header]="assignment.id ? 'Modifier le Service' : 'Créer un Service'" 
+          [modal]="true"
+          [draggable]="false"
+          [resizable]="false">
+    <ng-template pTemplate="content">
+        <div class="flex flex-col gap-6">
+            <div>
+                <label for="name" class="block font-bold mb-3">Nom *</label>
+                <input type="text" 
+                       pInputText 
+                       id="name" 
+                       [(ngModel)]="assignment.name" 
+                       required 
+                       autofocus 
+                       fluid 
+                       [class.ng-invalid]="submitted && !assignment.name" />
+                <small class="text-red-500" *ngIf="submitted && !assignment.name">
+                    Le nom est requis.
+                </small>
+            </div>
+            <div>
+                <label for="description" class="block font-bold mb-3">Description</label>
+                <textarea id="description" 
+                          pTextarea 
+                          [(ngModel)]="assignment.description" 
+                          rows="3" 
+                          cols="20" 
+                          fluid
+                          placeholder="Décrivez le service..."></textarea>
+            </div>
+        </div>
+    </ng-template>
+
+    <ng-template pTemplate="footer">
+        <p-button label="Annuler" 
+                  icon="pi pi-times" 
+                  [text]="true" 
+                  (click)="hideDialog()" />
+        <p-button [label]="assignment.id ? 'Modifier' : 'Créer'" 
+                  icon="pi pi-check" 
+                  (click)="dialogConfirmation(assignment)" />
+    </ng-template>
+</p-dialog>
+
+<!-- Dialog de confirmation -->
+<p-confirmdialog [style]="{ width: '450px' }" />
+
+<!-- Toast pour les notifications -->
+<p-toast position="top-right" [life]="3000" />

@@ -2,11 +2,17 @@ package com.presta.application.usecases;
 
 import com.presta.domain.exception.AssignmentNotFoundException;
 import com.presta.domain.model.Assignment;
+import org.springframework.data.domain.Sort;
 import com.presta.domain.port.out.AssignmentPort;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+
 import org.springframework.stereotype.Component;
 
-import java.util.List;
+
 import java.util.UUID;
+
 
 @Component
 public class AssignmentUseCase {
@@ -27,8 +33,12 @@ public class AssignmentUseCase {
         return assignmentPort.findById(id).orElseThrow(() -> new AssignmentNotFoundException(id));
     }
 
-    public List<Assignment> listAssignments() {
-        return assignmentPort.findAll();
+    public Page<Assignment> getAssignments(String searchName , Pageable pageable) {
+        return assignmentPort.findAssignments(searchName , pageable);
+    }
+
+    public Assignment updateAssignment(Assignment assignment){
+        return  assignmentPort.save(assignment);
     }
 
     public void deleteAssignment(UUID id) {
@@ -38,4 +48,34 @@ public class AssignmentUseCase {
         }
         assignmentPort.deleteById(id);
     }
+
+
+    public Page<Assignment> searchAssignments(AssignmentPort.AssignmentSearchCriteria criteria) {
+        // Création de la pagination et tri
+        Sort sort = createSort(criteria.sortBy(),criteria.sortDirection());
+        Pageable pageable = PageRequest.of(criteria.page(), criteria.size(), sort);
+
+        return assignmentPort.findAssignments(
+                criteria.searchName(),
+                pageable
+        );
+    }
+
+
+    // private methode
+    private Sort createSort(String sortBy, String sortDirection) {
+        if (sortBy == null || sortBy.isBlank()) {
+            sortBy = "id"; // Tri par défaut
+        }
+
+        Sort.Direction direction = "desc".equalsIgnoreCase(sortDirection)
+                ? Sort.Direction.DESC
+                : Sort.Direction.ASC;
+
+        return Sort.by(direction, sortBy);
+    }
+
+
+
+
 }

@@ -1,9 +1,16 @@
 package com.presta.infrastructure.persistence.adapters;
 
 import com.presta.domain.model.Assignment;
+import com.presta.domain.model.Client;
 import com.presta.domain.port.out.AssignmentPort;
 import com.presta.infrastructure.persistence.entities.AssignmentEntity;
+import com.presta.infrastructure.persistence.entities.ClientEntity;
+import com.presta.infrastructure.persistence.entities.UserEntity;
 import com.presta.infrastructure.persistence.repositories.assignment.JpaAssignmentRepository;
+import jakarta.persistence.criteria.Join;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,10 +23,10 @@ import java.util.stream.Collectors;
 @Transactional
 public class AssignmentRepositoryAdapter implements AssignmentPort {
 
-    private final JpaAssignmentRepository jpaRepo;
+    private final JpaAssignmentRepository jpaAssignmentRepository;
 
-    public AssignmentRepositoryAdapter(JpaAssignmentRepository jpaRepo) {
-        this.jpaRepo = jpaRepo;
+    public AssignmentRepositoryAdapter(JpaAssignmentRepository jpaAssignmentRepository) {
+        this.jpaAssignmentRepository = jpaAssignmentRepository;
     }
 
     private Assignment toDomain(AssignmentEntity e) {
@@ -38,32 +45,47 @@ public class AssignmentRepositoryAdapter implements AssignmentPort {
     public Assignment save(Assignment assignment) {
         if (assignment.id() == null) {
             Assignment withId = new Assignment(UUID.randomUUID(), assignment.name(), assignment.description());
-            AssignmentEntity saved = jpaRepo.save(toEntity(withId));
+            AssignmentEntity saved = jpaAssignmentRepository.save(toEntity(withId));
             return toDomain(saved);
         } else {
             AssignmentEntity entity = toEntity(assignment);
-            AssignmentEntity saved = jpaRepo.save(entity);
+            AssignmentEntity saved = jpaAssignmentRepository.save(entity);
             return toDomain(saved);
         }
     }
 
     @Override
     public Optional<Assignment> findById(UUID id) {
-        return jpaRepo.findById(id).map(this::toDomain);
+        return jpaAssignmentRepository.findById(id).map(this::toDomain);
     }
 
     @Override
     public List<Assignment> findAll() {
-        return jpaRepo.findAll().stream().map(this::toDomain).collect(Collectors.toList());
+        return jpaAssignmentRepository.findAll().stream().map(this::toDomain).collect(Collectors.toList());
     }
 
     @Override
     public void deleteById(UUID id) {
-        jpaRepo.deleteById(id);
+        jpaAssignmentRepository.deleteById(id);
     }
 
     @Override
     public boolean exists(UUID id) {
-        return jpaRepo.existsById(id);
+        return jpaAssignmentRepository.existsById(id);
+    }
+
+
+    @Override
+    public Page<Assignment> findAssignments(String searchName, Pageable pageable) {
+        Specification<AssignmentEntity> spec = Specification.where(null);
+
+        if (searchName != null && !searchName.isBlank()) {
+            spec = spec.and((root, query, cb) -> {
+                return cb.like(cb.lower(root.get("name")), "%" + searchName.toLowerCase() + "%");
+            });
+        }
+
+        Page<AssignmentEntity> entityPage = jpaAssignmentRepository.findAll(spec, pageable);
+        return entityPage.map(this::toDomain);
     }
 }

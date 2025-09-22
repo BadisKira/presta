@@ -5,8 +5,8 @@ export const routes: Routes = [
     // Routes publiques
     {
         path: '',
-        //loadComponent: () => import('./pages/landing/landing').then(m => m.LandingPage),
-        loadComponent: () => import('./pages/admin/admin').then(m => m.AdminPage),
+        loadComponent: () => import('./pages/landing/landing').then(m => m.LandingPage),
+        //loadComponent: () => import('./pages/admin/admin').then(m => m.AdminPage),
 
     },
 
@@ -16,12 +16,18 @@ export const routes: Routes = [
     //     loadComponent: () => import('./pages/landing/landing').then(m => m.LandingPage),
     //     canActivate: [authGuard]
     // },
-    // {
-    //     path: 'admin',
-    //     //loadComponent: () => import('./pages/admin/admin').then(m => m.AdminPage),
-    //     // canActivate: [authGuard],
-    //     // data: { roles: ['admin'] }
-    // },
+    {
+        path: 'admin',
+        loadComponent: () => import('./pages/admin/admin').then(m => m.AdminLayout),
+        // canActivate: [authGuard],
+        // data: { roles: ['ADMIN'] },
+        children:[
+            {   
+                path:'service', 
+                loadComponent:() => import('./pages/admin/service.page/service.page').then(m =>m.ServicePage)
+            }
+        ]
+    },
 
     //{ path: 'notfound', component: Notfound },
     { path: '**', redirectTo: '/notfound' }

@@ -24,12 +24,12 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(withInterceptors([
       httpTokenInterceptor,errorInterceptor
     ])),
-    //  {
-    //   provide: APP_INITIALIZER,
-    //   useFactory: kcFactory,
-    //   deps: [KeycloakService],
-    //   multi: true
-    // },
+     {
+      provide: APP_INITIALIZER,
+      useFactory: kcFactory,
+      deps: [KeycloakService],
+      multi: true
+    },
     provideAnimationsAsync(),
     providePrimeNG({
       theme:{
