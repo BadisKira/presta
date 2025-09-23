@@ -32,7 +32,7 @@ public class KeycloakAdminClient {
     public void init() {
         this.keycloak = KeycloakBuilder.builder()
                 .serverUrl(SERVER_URL)
-                .realm("master") // ⚠️ toujours master pour se connecter en admin
+                .realm("master") //
                 .grantType(OAuth2Constants.PASSWORD)
                 .clientId(CLIENT_ID)
                 .username(USERNAME)

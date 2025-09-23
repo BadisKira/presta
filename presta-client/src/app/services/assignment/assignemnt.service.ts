@@ -23,7 +23,6 @@ export class AssignemntService {
     return this.http.get<Assignment[]>(this._url_base).pipe(
       tap(data => data),
       catchError(error => {
-        console.log(error);
         this.messageService.add({
           severity: 'error',
           summary: 'Erreur service',
@@ -39,7 +38,6 @@ export class AssignemntService {
       ...assignemnt
     }).pipe(
        catchError(error => {
-        console.log(error);
         this.messageService.add({
           severity: 'error',
           summary: 'Erreur service',
@@ -57,7 +55,6 @@ export class AssignemntService {
       ...assignemnt
     }).pipe(
        catchError(error => {
-        console.log(error);
         this.messageService.add({
           severity: 'error',
           summary: 'Erreur service',
@@ -70,10 +67,8 @@ export class AssignemntService {
 
   
   deleteAssignment(assignmentId: string) {
-    console.log("Suppression de l'assignment:", assignmentId);
     return this.http.delete<Assignment>(this._url_base + `/${assignmentId}`).pipe(
         catchError(error => {
-            console.log(error);
             this.messageService.add({
                 severity: 'error',
                 summary: 'Erreur service',
@@ -107,7 +102,6 @@ getAssignments(params?: AssignmentSearchParams): Observable<PagedResponse<Assign
     }
 
     return this.http.get<PagedResponse<Assignment>>(this._url_base, { params: httpParams }).pipe(
-      tap(data => console.log('Assignments paginés récupérés:', data)),
       catchError(error => {
         console.log(error);
         this.messageService.add({

@@ -16,7 +16,7 @@ export class App implements OnInit {
   private keycloakService = inject(KeycloakService);
 
   ngOnInit(): void {
-    localStorage.setItem("role","ADMIN")
+    //localStorage.setItem("role","ADMIN")
     if (this.keycloakService.isLoggedIn() && localStorage.getItem("role") != "ADMIN") {
       this.keycloakService.syncUserWithBackend();
     }

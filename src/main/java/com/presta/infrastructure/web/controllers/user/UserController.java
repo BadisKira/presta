@@ -1,8 +1,10 @@
 package com.presta.infrastructure.web.controllers.user;
 
+import com.presta.domain.model.User;
 import com.presta.domain.port.in.UserSyncPort;
 import com.presta.domain.port.out.UserAuthenticationPort;
 import com.presta.infrastructure.external.keycloak.KeycloakAdminClient;
+import com.presta.infrastructure.persistence.adapters.UserRepositoryAdapter;
 import com.presta.infrastructure.web.dtos.user.UpdateUserDto;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -19,13 +21,15 @@ public class UserController {
     private final UserSyncPort userSyncPort;
     private final UserAuthenticationPort authPort;
     private final KeycloakAdminClient keycloakAdminClient;
+    private final UserRepositoryAdapter userRepositoryAdapter;
 
     public UserController(UserSyncPort userSyncPort,
                           UserAuthenticationPort authPort,
-                          KeycloakAdminClient keycloakAdminClient) {
+                          KeycloakAdminClient keycloakAdminClient, UserRepositoryAdapter userRepositoryAdapter) {
         this.userSyncPort = userSyncPort;
         this.authPort = authPort;
         this.keycloakAdminClient = keycloakAdminClient;
+        this.userRepositoryAdapter = userRepositoryAdapter;
     }
 
     @GetMapping("/sync")
@@ -61,14 +65,6 @@ public class UserController {
         ));
     }
 
-
-    @DeleteMapping("/{username}")
-    //@PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<String> deleteUser(@PathVariable String username) {
-        keycloakAdminClient.deleteUser(username);
-        return ResponseEntity.ok("Utilisateur supprimé : " + username);
-    }
-
     // ✅ Ajouter un rôle à un utilisateur
     @PostMapping("/{username}/roles")
     //@PreAuthorize("hasRole('ADMIN')")
@@ -96,20 +92,19 @@ public class UserController {
         return ResponseEntity.ok("Utilisateur mis à jour : " + id);
     }
 
-    // ✅ Bannir un utilisateur (désactiver son compte)
+
+
+
     @PutMapping("/{id}/ban")
-//@PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<String> banUser(@PathVariable String id) {
-        keycloakAdminClient.banUser(id);
-        return ResponseEntity.ok("Utilisateur banni : " + id);
+    //@PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<User> banUser(@PathVariable UUID id) {
+        return ResponseEntity.ok(this.userRepositoryAdapter.deactivateUser(id));
     }
 
-    // ✅ Débannir un utilisateur (réactiver son compte)
     @PutMapping("/{id}/unban")
-//@PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<String> unbanUser(@PathVariable String id) {
-        keycloakAdminClient.unbanUser(id);
-        return ResponseEntity.ok("Utilisateur réactivé : " + id);
+    //@PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<User> unbanUser(@PathVariable UUID id) {
+        return ResponseEntity.ok(this.userRepositoryAdapter.activateUser(id));
     }
 
 }

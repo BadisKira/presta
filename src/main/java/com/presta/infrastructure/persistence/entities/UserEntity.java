@@ -25,6 +25,9 @@ public class UserEntity {
     @Column(name = "email", length = 100, unique = true, nullable = false)
     private String email;
 
+    @Column(name = "is_active")
+    private boolean isActive;
+
 
     public UserEntity() {}
 
@@ -78,6 +81,14 @@ public class UserEntity {
         this.email = email;
     }
 
+    public boolean getIsActive() {
+        return isActive;
+    }
+
+    public void setIsActive(boolean isActive) {
+        this.isActive = isActive;
+    }
+
     // Helper method to get full name
     public String getFullName() {
         return firstName + " " + lastName;
@@ -85,18 +96,15 @@ public class UserEntity {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        UserEntity that = (UserEntity) o;
-        return Objects.equals(id, that.id);
+        if (!(o instanceof UserEntity that)) return false;
+        return isActive == that.isActive && Objects.equals(id, that.id) && Objects.equals(keycloakId, that.keycloakId) && Objects.equals(firstName, that.firstName) && Objects.equals(lastName, that.lastName) && Objects.equals(email, that.email);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id);
+        return Objects.hash(id, keycloakId, firstName, lastName, email, isActive);
     }
 
-    // toString (optional but useful for debugging)
     @Override
     public String toString() {
         return "UserEntity{" +
@@ -105,6 +113,7 @@ public class UserEntity {
                 ", firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
                 ", email='" + email + '\'' +
+                ", isActive=" + isActive +
                 '}';
     }
 }

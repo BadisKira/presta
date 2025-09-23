@@ -11,7 +11,8 @@ public record UserDto(
         UUID keycloakId,
         String firstName,
         String lastName,
-        String email
+        String email,
+        boolean isActive
 ) {
 
     public static UserDto fromDomain(User user) {
@@ -22,7 +23,8 @@ public record UserDto(
                 user.keycloakId().getValue(),
                 profile.getFirstName(),
                 profile.getLastName(),
-                contact.email()
+                contact.email(),
+                user.isActive()
         );
     }
 }

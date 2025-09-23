@@ -1,0 +1,121 @@
+<!-- client.page.html -->
+<p-toolbar styleClass="mb-6">
+    <ng-template pTemplate="start">
+        <!-- <p-button label="Nouveau" icon="pi pi-plus" severity="secondary" class="mr-2" (onClick)="openNew()" /> -->
+        <!-- <p-button severity="secondary" label="Supprimer" icon="pi pi-trash" outlined 
+                  (onClick)="openDeleteSelectedClientsDialogConfirmation(selectedClients)" 
+                  [disabled]="!selectedClients || !selectedClients.length" /> -->
+    </ng-template>
+
+    <ng-template pTemplate="end">
+        <p-button label="Actualiser" icon="pi pi-refresh" severity="secondary" class="mr-2" (onClick)="refreshData()" />
+        <p-button label="Exporter" icon="pi pi-upload" severity="secondary" (onClick)="exportCSV()" />
+    </ng-template>
+</p-toolbar>
+
+<!-- Table avec pagination côté serveur -->
+<p-table #dt [value]="clients()" [rows]="pageSize" [columns]="cols" [paginator]="true" [lazy]="true"
+    [totalRecords]="totalRecords()" [loading]="loading()" (onLazyLoad)="onPageChange($event)"
+    [globalFilterFields]="['user.profile.fullName', 'user.profile.firstName', 'user.profile.lastName', 'user.contactInfo.email']"
+    [tableStyle]="{ 'min-width': '75rem' }" [rowHover]="true" dataKey="id"
+    currentPageReportTemplate="Affichage de {first} à {last} sur {totalRecords} clients" [showCurrentPageReport]="true"
+    [rowsPerPageOptions]="[5, 10, 20, 50]" [sortField]="sortField" [sortOrder]="sortOrder === 'asc' ? 1 : -1"
+    (onSort)="onSort($event)">
+    <ng-template pTemplate="caption">
+        <div class="flex items-center justify-between">
+            <h5 class="m-0">Gérer les Clients</h5>
+            <div class="flex gap-2">
+                <p-iconfield>
+                    <p-inputicon styleClass="pi pi-search" />
+                    <input pInputText type="text" [value]="searchTerm" (input)="onGlobalFilter(dt, $event)"
+                        placeholder="Recherche par nom..." />
+                </p-iconfield>
+                <p-button icon="pi pi-times" severity="secondary" [outlined]="true" (onClick)="clearSearch()"
+                    [disabled]="!searchTerm" pTooltip="Effacer la recherche" />
+            </div>
+        </div>
+    </ng-template>
+
+    <ng-template pTemplate="header">
+        <tr>
+            <th style="width: 3rem">
+                <p-tableHeaderCheckbox />
+            </th>
+            <th pSortableColumn="user.profile.fullName" style="min-width:20rem">
+                Nom complet
+                <p-sortIcon field="user.profile.fullName" />
+            </th>
+            <th pSortableColumn="user.profile.firstName" style="min-width:15rem">
+                Prénom
+                <p-sortIcon field="user.profile.firstName" />
+            </th>
+            <th pSortableColumn="user.profile.lastName" style="min-width:15rem">
+                Nom
+                <p-sortIcon field="user.profile.lastName" />
+            </th>
+            <th pSortableColumn="user.contactInfo.email" style="min-width:20rem">
+                Email
+                <p-sortIcon field="user.contactInfo.email" />
+            </th>
+            <th style="min-width: 12rem">Actions</th>
+        </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-client>
+        <tr>
+            <td style="width: 3rem">
+                <p-tableCheckbox [value]="client" />
+            </td>
+            <td style="min-width: 20rem">
+                <strong>{{ getClientFullName(client) }}</strong>
+            </td>
+            <td style="min-width: 15rem">{{ getClientFirstName(client) }}</td>
+            <td style="min-width: 15rem">{{ getClientLastName(client) }}</td>
+            <td style="min-width: 20rem">
+                <a [href]="'mailto:' + getClientEmail(client)" class="text-blue-600 hover:text-blue-800">
+                    {{ getClientEmail(client) }}
+                </a>
+            </td>
+            <td>
+                @if (client.user.isActive) {
+                    <p-button icon="pi pi-trash" label="Bannir" severity="danger" [rounded]="false" [outlined]="true"
+                    (click)="openBanDialogConfirmation(client)" pTooltip="Bannir" />
+                } @else {
+                    <p-button  label="Réactiver" severity="success" [rounded]="false" [outlined]="true"
+                    (click)="openUnBanDialogConfirmation(client)" pTooltip="Réactiver" />
+                }
+                
+            </td>
+
+        </tr>
+    </ng-template>
+
+    <ng-template pTemplate="emptymessage">
+        <tr>
+            <td colspan="6" class="text-center p-4">
+                <div *ngIf="loading(); else noData">
+                    <i class="pi pi-spin pi-spinner" style="font-size: 2rem"></i>
+                    <p>Chargement des clients...</p>
+                </div>
+                <ng-template #noData>
+                    <i class="pi pi-info-circle" style="font-size: 2rem; color: #6c757d;"></i>
+                    <p>Aucun client trouvé</p>
+                </ng-template>
+            </td>
+        </tr>
+    </ng-template>
+
+    <ng-template pTemplate="loadingbody">
+        <tr>
+            <td colspan="6">
+                <div class="flex align-items-center justify-content-center p-4">
+                    <i class="pi pi-spin pi-spinner mr-2"></i>
+                    Chargement...
+                </div>
+            </td>
+        </tr>
+    </ng-template>
+</p-table>
+
+
+<p-confirmdialog [style]="{ width: '450px' }" />

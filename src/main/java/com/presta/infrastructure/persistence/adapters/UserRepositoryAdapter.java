@@ -1,5 +1,6 @@
 package com.presta.infrastructure.persistence.adapters;
 
+import com.presta.domain.exception.UserNotFoundException;
 import com.presta.domain.model.Assignment;
 import com.presta.domain.model.Client;
 import com.presta.domain.model.Contractor;
@@ -8,6 +9,7 @@ import com.presta.domain.model.valueobject.ContactInfo;
 import com.presta.domain.model.valueobject.KeycloakUserId;
 import com.presta.domain.model.valueobject.UserProfile;
 import com.presta.domain.port.out.UserRepositoryPort;
+import com.presta.infrastructure.external.keycloak.KeycloakAdminClient;
 import com.presta.infrastructure.persistence.entities.AssignmentEntity;
 import com.presta.infrastructure.persistence.entities.ClientEntity;
 import com.presta.infrastructure.persistence.entities.ContractorEntity;
@@ -17,6 +19,7 @@ import com.presta.infrastructure.persistence.repositories.user.JpaClientReposito
 import com.presta.infrastructure.persistence.repositories.user.JpaContractorRepository;
 import com.presta.infrastructure.persistence.repositories.user.JpaUserRepository;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.criteria.Join;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -27,8 +30,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Optional;
 import java.util.UUID;
 
-@Repository
+
 @Transactional
+@Repository
 public class UserRepositoryAdapter implements UserRepositoryPort {
 
     private final JpaUserRepository userJpaRepository;
@@ -36,19 +40,21 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
     private final JpaContractorRepository contractorJpaRepository;
     private final UserMapper userMapper;
     private final EntityManager entityManager;
+    private final KeycloakAdminClient keycloakAdminClient;
 
 
     public UserRepositoryAdapter(
             JpaUserRepository userJpaRepository,
             JpaClientRepository clientJpaRepository,
             JpaContractorRepository contractorJpaRepository,
-            UserMapper userMapper, EntityManager entityManager
+            UserMapper userMapper, EntityManager entityManager, KeycloakAdminClient keycloakAdminClient
     ) {
         this.userJpaRepository = userJpaRepository;
         this.clientJpaRepository = clientJpaRepository;
         this.contractorJpaRepository = contractorJpaRepository;
         this.userMapper = userMapper;
         this.entityManager = entityManager;
+        this.keycloakAdminClient = keycloakAdminClient;
     }
 
     // ===== USER OPERATIONS =====
@@ -105,6 +111,44 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
             contractorJpaRepository.deleteById(id);
         }
         userJpaRepository.deleteById(id);
+    }
+
+    @Override
+    public User deactivateUser(UUID id){
+
+        Optional<UserEntity> userEntity = userJpaRepository.findById(id);
+        if(userEntity.isEmpty()){
+            throw new UserNotFoundException(id);
+        }
+        try{
+            this.keycloakAdminClient.banUser(userEntity.get().getKeycloakId().toString());
+            return  toDomainUser(this.changeActivationAndReturn(id,false));
+        }catch (Exception e){
+            throw  new RuntimeException(e.getMessage());
+        }
+
+    }
+
+
+    @Override
+    public User activateUser(UUID id) {
+        Optional<UserEntity> userEntity = userJpaRepository.findById(id);
+        if(userEntity.isEmpty()){
+            throw new UserNotFoundException(id);
+        }
+        try{
+            this.keycloakAdminClient.unbanUser(userEntity.get().getKeycloakId().toString());
+            return toDomainUser(this.changeActivationAndReturn(id,true));
+        }catch (Exception e){
+            throw  new RuntimeException(e.getMessage());
+        }
+    }
+
+    @Transactional
+    public UserEntity changeActivationAndReturn(UUID userId, boolean active) {
+        userJpaRepository.changeActivationState(userId, active);
+        return userJpaRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found with id " + userId));
     }
 
     // ===== CLIENT OPERATIONS =====
@@ -271,7 +315,7 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
         UserProfile profile = new UserProfile(entity.getFirstName(), entity.getLastName());
         ContactInfo contactInfo = new ContactInfo(entity.getEmail());
 
-        return new User(entity.getId(), keycloakId, profile, contactInfo);
+        return new User(entity.getId(), keycloakId, profile, contactInfo,entity.getIsActive());
     }
 
     private Client toDomainClient(ClientEntity entity) {

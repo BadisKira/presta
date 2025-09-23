@@ -1,5 +1,5 @@
 import { Assignment } from "./assignment";
-import { UserDto } from "./user.model";
+import { User } from "./user.model";
 
 export interface ContractorDto {
   id: string;
@@ -7,7 +7,7 @@ export interface ContractorDto {
   address: string;
   assignment: Assignment;
   speciality: string;
-  user: UserDto;
+  user: User;
 }
 
 export interface UpdateContractorRequest {

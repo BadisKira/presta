@@ -119,8 +119,6 @@ export class KeycloakService {
    * Gestion des erreurs de sync
    */
   private handleSyncError(error: any): void {
-
-    console.log('This is not an error ', error);
     if (error.status < 400) {
       return;
     }

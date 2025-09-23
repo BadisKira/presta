@@ -10,18 +10,15 @@ export interface UserProfile {
 }
 
 
-export interface ContactInfo {
-  email: string;
-  phone?: string;
-}
 
-export interface UserDto {
-  id: string;
-  keycloakId: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-}
+
+// export interface UserDto {
+//   id: string;
+//   keycloakId: string;
+//   firstName: string;
+//   lastName: string;
+//   email: string;
+// }
 
 export interface AuthUser {
   keycloakId: string;
@@ -42,3 +39,26 @@ export interface UpdatePasswordDto {
 
 
 export type UserRoles = "ADMIN" | "CLIENT" | "CONTRACTOR" ;
+
+interface KeycloakId {
+  value: string;
+}
+
+interface Profile {
+  firstName: string;
+  lastName: string;
+  fullName: string;
+}
+
+interface ContactInfo {
+  email: string;
+  value: string;
+}
+
+export interface User {
+  id: string;
+  keycloakId: KeycloakId;
+  profile: Profile;
+  contactInfo: ContactInfo;
+  isActive:boolean
+}

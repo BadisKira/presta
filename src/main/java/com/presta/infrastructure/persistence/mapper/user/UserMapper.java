@@ -33,7 +33,8 @@ public class UserMapper {
                 entity.getId(),
                 KeycloakUserId.of(entity.getKeycloakId()),
                 UserProfile.of(entity.getFirstName(), entity.getLastName()),
-                ContactInfo.of(entity.getEmail())
+                ContactInfo.of(entity.getEmail()),
+                entity.getIsActive()
         );
     }
 

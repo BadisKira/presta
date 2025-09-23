@@ -11,7 +11,8 @@ public record User(
         UUID id,
         KeycloakUserId keycloakId,
         UserProfile profile,
-        ContactInfo contactInfo
+        ContactInfo contactInfo,
+        boolean isActive
 ) {
     public User {
         Objects.requireNonNull(id, "User ID cannot be null");
@@ -21,16 +22,30 @@ public record User(
     }
 
     public static User create(KeycloakUserId keycloakId, UserProfile profile, ContactInfo contactInfo) {
-        return new User(UUID.randomUUID(), keycloakId, profile, contactInfo);
+        return new User(UUID.randomUUID(), keycloakId, profile, contactInfo,true);
     }
 
     public User updateProfile(UserProfile newProfile) {
         Objects.requireNonNull(newProfile, "User profile cannot be null");
-        return new User(id, keycloakId, newProfile, contactInfo);
+        return new User(id, keycloakId, newProfile, contactInfo,isActive);
     }
 
     public User updateContactInfo(ContactInfo newContactInfo) {
         Objects.requireNonNull(newContactInfo, "Contact info cannot be null");
-        return new User(id, keycloakId, profile, newContactInfo);
+        return new User(id, keycloakId, profile, newContactInfo,isActive);
+    }
+
+    public User deActivateUser(){
+        if(!this.isActive()){
+            throw new RuntimeException("Utilsateur déja Bannie");
+        }
+        return  new User(id,keycloakId,profile,contactInfo,false);
+    }
+
+    public User activateUser(){
+        if(this.isActive()){
+            throw new RuntimeException("Utilisateur déja actif");
+        }
+        return  new User(id,keycloakId,profile,contactInfo,true);
     }
 }

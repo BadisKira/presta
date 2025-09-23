@@ -4,6 +4,7 @@ import com.presta.domain.model.Client;
 import com.presta.domain.model.Contractor;
 import com.presta.domain.model.User;
 import com.presta.domain.model.valueobject.KeycloakUserId;
+import com.presta.infrastructure.persistence.entities.UserEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -19,6 +20,8 @@ public interface UserRepositoryPort {
     Optional<User> findUserByKeycloakId(KeycloakUserId keycloakId);
     Optional<User> findUserById(UUID id);
     void deleteUser(UUID id);
+    User deactivateUser(UUID uuid);
+    User activateUser(UUID uuid);
 
     Client saveClient(Client client);
     Optional<Client> findClientById(UUID id);
