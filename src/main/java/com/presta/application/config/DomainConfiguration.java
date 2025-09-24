@@ -1,7 +1,6 @@
 package com.presta.application.config;
 
 
-import com.presta.domain.exception.DomainException;
 import com.presta.domain.port.in.UserProfilePort;
 import com.presta.domain.port.in.UserRegistrationPort;
 import com.presta.domain.port.in.UserSyncPort;

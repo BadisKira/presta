@@ -22,6 +22,8 @@ public interface UserRepositoryPort {
     void deleteUser(UUID id);
     User deactivateUser(UUID uuid);
     User activateUser(UUID uuid);
+    boolean isUserActive(UUID id);
+
 
     Client saveClient(Client client);
     Optional<Client> findClientById(UUID id);

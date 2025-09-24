@@ -1,5 +1,5 @@
 CREATE TABLE presta.availability_rule (
-    id UUID PRIMARY KEY DEFAULT ,
+    id UUID PRIMARY KEY  ,
     contractor_id UUID NOT NULL,
     week_days INTEGER[] NOT NULL,
     start_time TIME NOT NULL,
@@ -24,8 +24,23 @@ CREATE TABLE presta.availability_rule (
         CHECK (week_days <@ ARRAY[1,2,3,4,5,6,7])
 );
 
+CREATE TABLE presta.break_time (
+    id UUID PRIMARY KEY  ,
+    availability_rule_id UUID NOT NULL,
+    start_time TIME NOT NULL,
+    end_time TIME NOT NULL,
+    week_days INTEGER[], -- NULL = tous les jours de la règle
+
+    CONSTRAINT fk_availability_rule
+        FOREIGN KEY (availability_rule_id)
+        REFERENCES presta.availability_rule(id) ON DELETE CASCADE,
+
+    CONSTRAINT check_break_time
+        CHECK (end_time > start_time)
+);
+
 CREATE TABLE presta.unavailability_rule (
-    id UUID PRIMARY KEY DEFAULT ,
+    id UUID PRIMARY KEY  ,
     contractor_id UUID NOT NULL,
     start_date DATE NOT NULL,
     end_date DATE NOT NULL,
@@ -48,20 +63,7 @@ CREATE TABLE presta.unavailability_rule (
         )
 );
 
-CREATE TABLE presta.break_time (
-    id UUID PRIMARY KEY DEFAULT ,
-    availability_rule_id UUID NOT NULL,
-    start_time TIME NOT NULL,
-    end_time TIME NOT NULL,
-    week_days INTEGER[], -- NULL = tous les jours de la règle
 
-    CONSTRAINT fk_availability_rule
-        FOREIGN KEY (availability_rule_id)
-        REFERENCES presta.availability_rule(id) ON DELETE CASCADE,
-
-    CONSTRAINT check_break_time
-        CHECK (end_time > start_time)
-);
 --
 --CREATE TABLE presta.appointment (
 --    id UUID PRIMARY KEY DEFAULT ,

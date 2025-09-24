@@ -26,4 +26,12 @@ public interface JpaUserRepository extends JpaRepository<UserEntity, UUID> {
     int changeActivationState(UUID uuid, boolean active);
 
 
+    @Query("""
+            Select u.isActive
+            From UserEntity u
+            WHERE u.id = ?1
+            """)
+    boolean isUserActive(UUID id);
+
+
 }

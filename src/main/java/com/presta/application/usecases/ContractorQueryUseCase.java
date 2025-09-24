@@ -65,6 +65,12 @@ public class ContractorQueryUseCase implements ContractorQueryPort {
 
         return userRepositoryPort.saveContractor(updatedContractor);
     }
+
+    @Override
+    public boolean isActive(UUID contractorId) {
+        return false;
+    }
+
     private Sort createSort(String sortBy, String sortDirection) {
         if (sortBy == null || sortBy.isBlank()) {
             sortBy = "id"; // Tri par défaut

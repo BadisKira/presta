@@ -103,7 +103,6 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
 
     @Override
     public void deleteUser(UUID id) {
-        // Supprimer dans l'ordre : Client/Contractor puis User
         if (clientJpaRepository.existsById(id)) {
             clientJpaRepository.deleteById(id);
         }
@@ -142,6 +141,11 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
         }catch (Exception e){
             throw  new RuntimeException(e.getMessage());
         }
+    }
+
+    @Override
+    public boolean isUserActive(UUID id) {
+        return false;
     }
 
     @Transactional

@@ -8,6 +8,7 @@ import java.util.UUID;
 
 public interface ContractorQueryPort {
 
+
     record ContractorSearchCriteria(
             String name,
             String speciality,
@@ -19,5 +20,6 @@ public interface ContractorQueryPort {
 
     Page<Contractor> searchContractors(ContractorSearchCriteria criteria);
     Contractor updateContractor( UUID contractorId , String address , UUID assignmentId , String speciality);
+    boolean isActive(UUID contractorId);
     }
 

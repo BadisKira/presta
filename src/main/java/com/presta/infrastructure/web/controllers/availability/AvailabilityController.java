@@ -1,0 +1,38 @@
+package com.presta.infrastructure.web.controllers.availability;
+
+import com.presta.domain.model.AvailabilityRule;
+import com.presta.infrastructure.persistence.adapters.availability.AvailabilityRepositoryAdapter;
+import com.presta.infrastructure.web.dtos.availability.CreateAvailabilityRuleRequest;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.UUID;
+
+@RestController
+@RequestMapping("/api/availabilities")
+public class AvailabilityController{
+
+    private final AvailabilityRepositoryAdapter availabilityRepositoryAdapter;
+
+    public AvailabilityController(AvailabilityRepositoryAdapter availabilityRepositoryAdapter) {
+        this.availabilityRepositoryAdapter = availabilityRepositoryAdapter;
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<List<AvailabilityRule>> vv(@PathVariable UUID contractorId){
+        return ResponseEntity.ok(this.availabilityRepositoryAdapter.findActiveByContractorId(contractorId));
+    }
+
+    @PostMapping
+    public ResponseEntity<AvailabilityRule> save(@RequestBody CreateAvailabilityRuleRequest createAvailabilityRuleRequest){
+            return new ResponseEntity<AvailabilityRule>(
+                    this.availabilityRepositoryAdapter.save(
+                            createAvailabilityRuleRequest.toDomain()
+                    ),
+                    HttpStatusCode.valueOf(201)
+            );
+    }
+
+}
