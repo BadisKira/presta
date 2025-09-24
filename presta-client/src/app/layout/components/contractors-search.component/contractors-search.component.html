@@ -1,0 +1,210 @@
+<div class="p-6">
+  <!-- Formulaire de recherche -->
+  <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+    <h2 class="text-2xl font-semibold text-gray-800 mb-6">Recherche de Contractors</h2>
+
+    <form [formGroup]="searchForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <!-- Nom complet -->
+      <div class="flex flex-col">
+        <label for="fullName" class="text-sm font-medium text-gray-700 mb-2">
+          Nom complet
+        </label>
+        <input pInputText id="fullName" formControlName="fullName" placeholder="Rechercher par nom..." class="w-full" />
+      </div>
+
+      <!-- Adresse -->
+      <div class="flex flex-col">
+        <label for="address" class="text-sm font-medium text-gray-700 mb-2">
+          Adresse
+        </label>
+        <input pInputText id="address" formControlName="address" placeholder="Rechercher par adresse..."
+          class="w-full" />
+      </div>
+
+      <assignment-select (assignmentSelected)="fillAssignment($event)" subtitle="Service" />
+
+      <!-- Spécialité -->
+      <div class="flex flex-col">
+        <label for="speciality" class="text-sm font-medium text-gray-700 mb-2">
+          Spécialité
+        </label>
+        <input pInputText id="speciality" formControlName="speciality" placeholder="Rechercher par spécialité..."
+          class="w-full" />
+      </div>
+
+      <!-- Bouton Effacer -->
+      <div class="flex items-end md:col-span-2 justify-end">
+        <p-button label="Effacer les filtres" icon="pi pi-times" (onClick)="clearFilters()" severity="secondary"
+          [text]="true">
+        </p-button>
+      </div>
+    </form>
+  </div>
+
+
+  <div *ngIf="loading()" class="flex justify-center items-center py-8">
+    <p-progressSpinner [style]="{width: '50px', height: '50px'}" strokeWidth="4">
+    </p-progressSpinner>
+  </div>
+
+  <!-- Résultats sous forme de cartes -->
+  <div class="w-full" *ngIf="!loading()">
+  <div *ngIf="contractors()?.length; else empty" 
+       class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-8">
+    
+    <p-card *ngFor="let contractor of contractors(); trackBy: trackById"
+            class="group relative overflow-hidden bg-white rounded-2xl shadow-sm cursor-pointer">
+            
+      <!-- Header élégant -->
+      <ng-template pTemplate="header">
+        <div class="relative p-6 pb-4">
+          <div class="flex items-start justify-between mb-4">
+            <!-- Statut badge flottant -->
+            <div class="absolute top-3 right-3 z-10">
+              <p-tag 
+                [value]="contractor.user.isActive ? '●' : '●'"
+                [severity]="contractor.user.isActive ? 'success' : 'warning'"
+                class="!px-3 !py-1 !text-xs font-semibold shadow-md">
+                <span class="ml-1">{{ contractor.user.isActive ? 'Actif' : 'Inactif' }}</span>
+              </p-tag>
+            </div>
+          </div>
+
+          <!-- Avatar et infos principales -->
+          <div class="flex items-center space-x-4 mb-4">
+            <div class="relative">
+              <p-avatar 
+                [label]="initials(contractor.fullName)" 
+                shape="circle" 
+                size="xlarge"
+                class="!w-16 !h-16 bg-gradient-to-br from-blue-500 to-purple-600 text-white font-bold shadow-lg ring-4 ring-white">
+              </p-avatar>
+              <!-- Indicateur de statut sur avatar -->
+              <div [class]="'absolute -bottom-1 -right-1 w-5 h-5 rounded-full border-3 border-white shadow-md ' + 
+                           (contractor.user.isActive ? 'bg-green-400' : 'bg-orange-400')">
+              </div>
+            </div>
+            
+            <div class="flex-1 min-w-0">
+              <h3 class="text-xl font-bold text-gray-900 truncate group-hover:text-blue-600 transition-colors duration-300">
+                {{ contractor.fullName || 'Nom indisponible' }}
+              </h3>
+              <p class="text-sm font-medium text-blue-600 mt-1 truncate">
+                {{ contractor.assignment.name ?? 'Pas d\'assignation' }}
+              </p>
+            </div>
+          </div>
+
+          <!-- Spécialité en badge élégant -->
+          <div class="inline-flex items-center px-3 py-1 rounded-full bg-gradient-to-r from-gray-100 to-gray-200 text-gray-800">
+            <i class="pi pi-star-fill text-yellow-500 text-xs mr-2"></i>
+            <span class="text-sm font-medium">
+              {{ contractor.speciality || 'Spécialité non définie' }}
+            </span>
+          </div>
+        </div>
+      </ng-template>
+
+      <!-- Contenu avec design moderne -->
+      <div class="relative px-6 pb-6 space-y-5">
+        
+        <!-- Informations avec design sophistiqué -->
+        <div class="space-y-4">
+          
+          <!-- Adresse -->
+          <div class="flex items-start space-x-4 group/item">
+            <div class="flex-shrink-0 w-10 h-10 bg-red-50 rounded-xl flex items-center justify-center group-hover/item:bg-red-100 transition-colors duration-200">
+              <i class="pi pi-map-marker text-red-500 text-sm"></i>
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Adresse</p>
+              <p class="text-sm text-gray-900 leading-relaxed">
+                {{ contractor.address || 'Adresse indisponible' }}
+              </p>
+            </div>
+          </div>
+
+          <!-- Email -->
+          <div class="flex items-start space-x-4 group/item">
+            <div class="flex-shrink-0 w-10 h-10 bg-green-50 rounded-xl flex items-center justify-center group-hover/item:bg-green-100 transition-colors duration-200">
+              <i class="pi pi-envelope text-green-500 text-sm"></i>
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Contact</p>
+              <p class="text-sm text-gray-900 truncate">
+                {{ contractor.user.contactInfo.email || 'Email indisponible' }}
+              </p>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Divider élégant -->
+        <div class="border-t border-gray-100"></div>
+
+        <!-- ID Keycloak discret -->
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-2">
+            <i class="pi pi-id-card text-purple-400 text-sm"></i>
+            <span class="text-xs text-gray-400 font-mono">
+              {{ (contractor.user.keycloakId.value || 'N/A') | slice:0:8 }}
+              <span *ngIf="contractor.user.keycloakId.value">...</span>
+            </span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Footer avec CTA élégant -->
+      <ng-template pTemplate="footer">
+        <div class="relative px-6 pb-6 pt-0">
+          <button 
+            pButton 
+            type="button" 
+            label="Voir le profil" 
+            icon="pi pi-arrow-right"
+            [routerLink]="['/contractors', contractor.id]"
+            class="w-full !bg-gradient-to-r !from-green-600 !to-green-700  !border-0 text-white font-semibold !py-3 !px-6 !rounded-xl shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300 group-hover:shadow-xl">
+          </button>
+        </div>
+      </ng-template>
+
+    </p-card>
+  </div>
+
+
+   <p-paginator *ngIf="totalElements() > pageSize()" 
+             [rows]="pageSize()" 
+             [totalRecords]="totalElements()"
+             [first]="currentPage() * pageSize()" 
+             (onPageChange)="onPageChange($event)"
+             class="!bg-inherit border-0 shadow-none p-0">
+</p-paginator>
+
+  </div>
+
+  <!-- Paginator (si tu gardes ta pagination serveur) -->
+
+
+  <!-- Empty state -->
+  <ng-template #empty>
+    <div class="flex flex-col items-center justify-center py-20">
+      <div class="relative mb-8">
+        <div class="w-32 h-32 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full flex items-center justify-center">
+          <i class="pi pi-search text-4xl text-gray-400"></i>
+        </div>
+        <div class="absolute -top-2 -right-2 w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
+          <i class="pi pi-times text-white text-sm"></i>
+        </div>
+      </div>
+      
+      <h3 class="text-2xl font-bold text-gray-900 mb-3">
+        Aucun prestaitre trouvé
+      </h3>
+      <p class="text-gray-600 text-center max-w-md leading-relaxed">
+        Aucun résultat ne correspond à vos critères de recherche.<br>
+        Essayez de modifier vos filtres ou d'élargir votre recherche.
+      </p>
+    </div>
+  </ng-template>
+</div>

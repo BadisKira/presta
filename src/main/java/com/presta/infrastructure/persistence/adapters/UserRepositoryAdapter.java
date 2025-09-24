@@ -8,19 +8,20 @@ import com.presta.domain.model.User;
 import com.presta.domain.model.valueobject.ContactInfo;
 import com.presta.domain.model.valueobject.KeycloakUserId;
 import com.presta.domain.model.valueobject.UserProfile;
-import com.presta.domain.port.out.UserRepositoryPort;
+import com.presta.domain.port.UserRepositoryPort;
 import com.presta.infrastructure.external.keycloak.KeycloakAdminClient;
 import com.presta.infrastructure.persistence.entities.AssignmentEntity;
 import com.presta.infrastructure.persistence.entities.ClientEntity;
 import com.presta.infrastructure.persistence.entities.ContractorEntity;
 import com.presta.infrastructure.persistence.entities.UserEntity;
-import com.presta.infrastructure.persistence.mapper.user.UserMapper;
-import com.presta.infrastructure.persistence.repositories.user.JpaClientRepository;
-import com.presta.infrastructure.persistence.repositories.user.JpaContractorRepository;
-import com.presta.infrastructure.persistence.repositories.user.JpaUserRepository;
+import com.presta.infrastructure.persistence.mapper.UserMapper;
+import com.presta.infrastructure.persistence.repositories.JpaClientRepository;
+import com.presta.infrastructure.persistence.repositories.JpaContractorRepository;
+import com.presta.infrastructure.persistence.repositories.JpaUserRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.JoinType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -82,7 +83,10 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
         } else {
             // CREATE nouvelle entité
             entity = createEntityFromUser(user);
+            entity.setIsActive(true);
         }
+
+
 
         UserEntity saved = userJpaRepository.save(entity);
         entityManager.flush(); // Force la synchronisation avec la DB
@@ -103,7 +107,6 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
 
     @Override
     public void deleteUser(UUID id) {
-        // Supprimer dans l'ordre : Client/Contractor puis User
         if (clientJpaRepository.existsById(id)) {
             clientJpaRepository.deleteById(id);
         }
@@ -144,6 +147,15 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
         }
     }
 
+    @Override
+    public boolean isUserActive(UUID id) {
+        Optional<UserEntity> userEntity = userJpaRepository.findById(id);
+        if(userEntity.isEmpty()){
+            throw new UserNotFoundException(id);
+        }
+        return userEntity.get().getIsActive();
+    }
+
     @Transactional
     public UserEntity changeActivationAndReturn(UUID userId, boolean active) {
         userJpaRepository.changeActivationState(userId, active);
@@ -155,7 +167,7 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
 
     @Override
     @Transactional
-    public Client saveClient(Client client) {
+    public void saveClient(Client client) {
         // Le User DOIT exister avant de créer un Client
         UserEntity userEntity = userJpaRepository.findById(client.id())
                 .orElseThrow(() -> new IllegalStateException(
@@ -186,7 +198,7 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
 
         entityManager.flush();
 
-        return toDomainClient(clientEntity);
+        toDomainClient(clientEntity);
     }
 
     @Override
@@ -246,6 +258,8 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
         return toDomainContractor(contractorEntity);
     }
 
+
+
     @Override
     public Optional<Contractor> findContractorById(UUID id) {
         return contractorJpaRepository.findById(id)
@@ -253,22 +267,45 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
     }
 
     @Override
-    public Page<Contractor> findContractors(String name, String speciality, Pageable pageable) {
+    public Page<Contractor> findContractors(String name, String speciality, String assignmentId, String address, Pageable pageable) {
         Specification<ContractorEntity> spec = Specification.where(null);
 
+        // Recherche par nom (fullName)
         if (name != null && !name.isBlank()) {
             spec = spec.and((root, query, cb) ->
                     cb.like(cb.lower(root.get("fullName")), "%" + name.toLowerCase() + "%"));
         }
 
+        // Recherche par spécialité
         if (speciality != null && !speciality.isBlank()) {
             spec = spec.and((root, query, cb) ->
                     cb.like(cb.lower(root.get("speciality")), "%" + speciality.toLowerCase() + "%"));
         }
 
+        // Recherche par assignmentId (avec jointure)
+        if (assignmentId != null && !assignmentId.isBlank()) {
+            spec = spec.and((root, query, cb) -> {
+                Join<ContractorEntity, AssignmentEntity> assignmentJoin = root.join("assignment", JoinType.INNER);
+                try {
+                    UUID assignmentUuid = UUID.fromString(assignmentId);
+                    return cb.equal(assignmentJoin.get("id"), assignmentUuid);
+                } catch (IllegalArgumentException e) {
+                    // Si l'assignmentId n'est pas un UUID valide, on peut aussi chercher par nom d'assignment
+                    return cb.like(cb.lower(assignmentJoin.get("name")), "%" + assignmentId.toLowerCase() + "%");
+                }
+            });
+        }
+
+        // Recherche par adresse
+        if (address != null && !address.isBlank()) {
+            spec = spec.and((root, query, cb) ->
+                    cb.like(cb.lower(root.get("address")), "%" + address.toLowerCase() + "%"));
+        }
+
         Page<ContractorEntity> entityPage = contractorJpaRepository.findAll(spec, pageable);
         return entityPage.map(userMapper::toDomain);
     }
+
 
     @Override
     public Page<Client> findClients(String name, Pageable pageable) {
@@ -299,7 +336,8 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
                 user.keycloakId().getValue(),
                 user.profile().getFirstName(),
                 user.profile().getLastName(),
-                user.contactInfo().email()
+                user.contactInfo().email(),
+                user.isActive()
         );
     }
 

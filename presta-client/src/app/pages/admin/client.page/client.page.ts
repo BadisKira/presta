@@ -24,7 +24,7 @@ interface ExportColumn {
 }
 
 @Component({
-  selector: 'app-client.page',
+  selector: 'app-admin-client.page',
   imports: [
     CommonModule,
     TableModule,
@@ -37,7 +37,6 @@ interface ExportColumn {
     ConfirmDialog
   ],
   templateUrl: './client.page.html',
-  styleUrl: './client.page.scss',
   providers: [ConfirmationService]
 })
 export class ClientPage implements OnInit {
@@ -114,7 +113,6 @@ export class ClientPage implements OnInit {
         this.clients.set(response.content);
         this.totalRecords.set(response.totalElements);
         this.loading.set(false);
-        console.log('Clients chargés:', response);
       },
       error: (error) => {
         this.loading.set(false);

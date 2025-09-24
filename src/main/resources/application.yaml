@@ -39,4 +39,23 @@ flyway:
   default-schema: presta
   baseline-on-migrate: true
 
-
+#logging:
+#  file:
+#    name: logs/presta.log          # écrit aussi dans un fichier (en plus de la console)
+#  level:
+#    root: INFO
+#    # Spring web & MVC
+#    org.springframework.web: DEBUG
+#    # Spring Security (dont Resource Server)
+#    org.springframework.security: DEBUG
+#    org.springframework.security.oauth2: DEBUG
+#    org.springframework.security.oauth2.server.resource: DEBUG
+#    # Auto-config report utile en debug
+#    org.springframework.boot.autoconfigure: INFO
+#    # JPA/Hibernate : SQL + bindings (Hibernate 6+)
+#    org.hibernate.SQL: DEBUG
+#    org.hibernate.orm.jdbc.bind: TRACE
+#    # Pour Hibernate 5.x (si jamais) : décommente la ligne suivante
+#    # org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+#    # Flyway
+#    org.flywaydb: DEBUG

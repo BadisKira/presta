@@ -9,7 +9,7 @@ import java.util.Set;
 
 public record BreakTime(
         TimeRange timeRange,
-        Set<DayOfWeek> weekDays  // null = tous les jours de la règle
+        Set<DayOfWeek> weekDays
 ) {
     public BreakTime {
         if (timeRange == null) {
@@ -35,13 +35,13 @@ public record BreakTime(
         LocalTime slotStartTime = slotStart.toLocalTime();
         LocalTime slotEndTime = slotEnd.toLocalTime();
 
-        // Vérifier si la pause s'applique à ce jour
         if (!appliesTo(slotStart.getDayOfWeek())) {
             return false;
         }
 
-        // Vérifier le chevauchement temporel
-        return !slotEndTime.isBefore(timeRange.startTime()) &&
-                !slotStartTime.isAfter(timeRange.endTime());
+
+        return slotStartTime.isBefore(timeRange.endTime()) &&
+                slotEndTime.isAfter(timeRange.startTime());
     }
+
 }

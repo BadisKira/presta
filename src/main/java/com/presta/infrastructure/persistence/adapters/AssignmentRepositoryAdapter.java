@@ -1,13 +1,9 @@
 package com.presta.infrastructure.persistence.adapters;
 
 import com.presta.domain.model.Assignment;
-import com.presta.domain.model.Client;
-import com.presta.domain.port.out.AssignmentPort;
+import com.presta.domain.port.AssignmentPort;
 import com.presta.infrastructure.persistence.entities.AssignmentEntity;
-import com.presta.infrastructure.persistence.entities.ClientEntity;
-import com.presta.infrastructure.persistence.entities.UserEntity;
-import com.presta.infrastructure.persistence.repositories.assignment.JpaAssignmentRepository;
-import jakarta.persistence.criteria.Join;
+import com.presta.infrastructure.persistence.repositories.JpaAssignmentRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;

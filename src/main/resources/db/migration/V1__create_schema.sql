@@ -1,4 +1,7 @@
+CREATE SCHEMA IF NOT EXISTS presta ;
+
 CREATE TABLE presta.user_app (
+
     id UUID PRIMARY KEY  ,
     keycloak_id UUID UNIQUE NOT NULL,
     first_name VARCHAR(50) NOT NULL,

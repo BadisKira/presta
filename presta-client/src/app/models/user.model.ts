@@ -9,17 +9,6 @@ export interface UserProfile {
   token?: string;
 }
 
-
-
-
-// export interface UserDto {
-//   id: string;
-//   keycloakId: string;
-//   firstName: string;
-//   lastName: string;
-//   email: string;
-// }
-
 export interface AuthUser {
   keycloakId: string;
   profile: UserProfile;

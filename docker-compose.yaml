@@ -10,7 +10,6 @@ services:
     volumes:
       - presta-db-data:/var/lib/postgresql/data
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
-
     environment:
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: admin
@@ -75,7 +74,7 @@ services:
       KC_DB_PASSWORD: admin
       KC_DB_SCHEMA: keycloak
     volumes:
-      - ./realm-export.json:/opt/keycloak/data/realm-export.json
+      - ./realm-export.json:/opt/keycloak/data/import/realm-export.json
     command:
       - start-dev
       - --import-realm

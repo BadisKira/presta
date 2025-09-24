@@ -1,0 +1,12 @@
+package com.presta.infrastructure.persistence.repositories;
+
+import com.presta.infrastructure.persistence.entities.AssignmentEntity;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.stereotype.Repository;
+
+import java.util.UUID;
+
+@Repository
+public interface JpaAssignmentRepository extends JpaRepository<AssignmentEntity, UUID> , JpaSpecificationExecutor<AssignmentEntity> {
+}

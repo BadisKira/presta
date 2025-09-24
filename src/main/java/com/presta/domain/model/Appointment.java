@@ -20,25 +20,28 @@ public class Appointment {
 
     // Factory method pour création
     public static Appointment create(
+            UUID id,
             UUID clientId,
             UUID contractorId,
             LocalDateTime startDateTime,
             int duration,
-            String reason) {
+            String reason,
+            String notes
+    ) {
 
         return new Appointment(
-                UUID.randomUUID(),
+                id,
                 clientId,
                 contractorId,
                 new TimeSlot(startDateTime, duration),
                 AppointmentStatus.PENDING,
-                new AppointmentDetails(reason, null),
+                new AppointmentDetails(reason, notes),
                 LocalDateTime.now(),
                 LocalDateTime.now()
         );
     }
 
-    // Constructor complet pour reconstitution
+
     public Appointment(
             UUID id,
             UUID clientId,
@@ -49,7 +52,7 @@ public class Appointment {
             LocalDateTime createdAt,
             LocalDateTime updatedAt) {
 
-        validateAppointment(id, clientId, contractorId, slot);
+        validateAppointment(clientId, contractorId, slot);
 
         this.id = id;
         this.clientId = clientId;
@@ -150,10 +153,7 @@ public class Appointment {
     }
 
     // Validation
-    private void validateAppointment(UUID id, UUID clientId, UUID contractorId, TimeSlot slot) {
-        if (id == null) {
-            throw new IllegalArgumentException("L'ID du rendez-vous est obligatoire");
-        }
+    private void validateAppointment( UUID clientId, UUID contractorId, TimeSlot slot) {
 
         if (clientId == null) {
             throw new IllegalArgumentException("L'ID du client est obligatoire");
