@@ -1,12 +1,11 @@
-package com.presta.domain.port.in.contractor;
+package com.presta.domain.port.out;
 
-import com.presta.domain.model.Assignment;
 import com.presta.domain.model.Contractor;
 import org.springframework.data.domain.Page;
 
 import java.util.UUID;
 
-public interface ContractorQueryPort {
+public interface ContractorRepositoryPort {
 
 
     record ContractorSearchCriteria(

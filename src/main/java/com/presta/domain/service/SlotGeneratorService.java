@@ -7,10 +7,11 @@ import com.presta.domain.model.valueobject.AppointmentStatus;
 import com.presta.domain.model.valueobject.AvailabilityStatus;
 import com.presta.domain.model.valueobject.AvailableSlot;
 import com.presta.domain.model.valueobject.TimeSlot;
-import com.presta.domain.port.in.availability.AppointmentQueryPort;
-import com.presta.domain.port.in.availability.AvailabilityQueryPort;
-import com.presta.domain.port.in.availability.UnavailabilityQueryPort;
-import com.presta.domain.port.in.contractor.ContractorQueryPort;
+import com.presta.domain.port.out.ContractorRepositoryPort;
+import com.presta.domain.port.out.AppointmentRepositoryPort;
+import com.presta.domain.port.out.AvailabilityRuleRepositoryPort;
+import com.presta.domain.port.out.UnavailabilityRuleRepositoryPort;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -29,16 +30,16 @@ import java.util.stream.Collectors;
  */
 public class SlotGeneratorService {
 
-    private final AvailabilityQueryPort availabilityQueryPort;
-    private final UnavailabilityQueryPort unavailabilityQueryPort;
-    private final AppointmentQueryPort appointmentQueryPort;
-    private final ContractorQueryPort contractorQueryPort;
+    private final AvailabilityRuleRepositoryPort availabilityRuleRepositoryPort;
+    private final UnavailabilityRuleRepositoryPort unavailabilityRuleRepositoryPort;
+    private final AppointmentRepositoryPort appointmentRepositoryPort;
+    private final ContractorRepositoryPort contractorRepositoryPort;
 
-    public SlotGeneratorService(AvailabilityQueryPort availabilityQueryPort, UnavailabilityQueryPort unavailabilityQueryPort, AppointmentQueryPort appointmentQueryPort, ContractorQueryPort contractorQueryPort) {
-        this.availabilityQueryPort = availabilityQueryPort;
-        this.unavailabilityQueryPort = unavailabilityQueryPort;
-        this.appointmentQueryPort = appointmentQueryPort;
-        this.contractorQueryPort = contractorQueryPort;
+    public SlotGeneratorService(AvailabilityRuleRepositoryPort availabilityRuleRepositoryPort, UnavailabilityRuleRepositoryPort unavailabilityRuleRepositoryPort, AppointmentRepositoryPort appointmentRepositoryPort, ContractorRepositoryPort contractorRepositoryPort) {
+        this.availabilityRuleRepositoryPort = availabilityRuleRepositoryPort;
+        this.unavailabilityRuleRepositoryPort = unavailabilityRuleRepositoryPort;
+        this.appointmentRepositoryPort = appointmentRepositoryPort;
+        this.contractorRepositoryPort = contractorRepositoryPort;
     }
 
 
@@ -61,7 +62,7 @@ public class SlotGeneratorService {
         }
 
         // 2. Récupérer toutes les règles actives du prestataire
-        List<AvailabilityRule> activeRules = availabilityQueryPort
+        List<AvailabilityRule> activeRules = availabilityRuleRepositoryPort
                 .findActiveByContractorId(contractorId);
 
         if (activeRules.isEmpty()) {
@@ -72,11 +73,11 @@ public class SlotGeneratorService {
         List<TimeSlot> rawSlots = generateRawSlots(activeRules, startDate, endDate);
 
         // 4. Récupérer les indisponibilités sur la période
-        List<UnavailabilityRule> unavailabilities = unavailabilityQueryPort
+        List<UnavailabilityRule> unavailabilities = unavailabilityRuleRepositoryPort
                 .findByContractorIdAndPeriod(contractorId, startDate, endDate);
 
         // 5. Récupérer les rendez-vous existants sur la période
-        List<Appointment> existingAppointments = appointmentQueryPort
+        List<Appointment> existingAppointments = appointmentRepositoryPort
                 .findActiveByContractorIdAndPeriod(contractorId,
                         startDate.atStartOfDay(),
                         endDate.plusDays(1).atStartOfDay());
@@ -193,7 +194,7 @@ public class SlotGeneratorService {
      * Vérifie si le contractor est actif
      */
     private boolean isContractorActive(UUID contractorId) {
-        return contractorQueryPort.isActive(contractorId);
+        return contractorRepositoryPort.isActive(contractorId);
     }
 
     /**

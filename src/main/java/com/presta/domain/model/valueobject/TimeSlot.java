@@ -51,33 +51,3 @@ public record TimeSlot(
                 !otherEnd.isBefore(this.startDateTime);
     }
 }
-
-//public record TimeSlot(
-//        UUID contractorId,
-//        LocalDateTime startDateTime,
-//        LocalDateTime endDateTime,
-//        int duration,
-//        boolean isAvailable
-//) {
-//    public TimeSlot {
-//        if (contractorId == null || startDateTime == null || endDateTime == null) {
-//            throw new IllegalArgumentException("Tous les champs sont obligatoires");
-//        }
-//        if (!endDateTime.isAfter(startDateTime)) {
-//            throw new IllegalArgumentException("La fin doit être après le début");
-//        }
-//        if (duration <= 0) {
-//            throw new IllegalArgumentException("La durée doit être positive");
-//        }
-//    }
-//
-//    public boolean contains(LocalDateTime dateTime) {
-//        return !dateTime.isBefore(startDateTime) && !dateTime.isAfter(endDateTime);
-//    }
-//
-//    public boolean overlaps(TimeSlot other) {
-//        return !this.endDateTime.isBefore(other.startDateTime) &&
-//                !other.endDateTime.isBefore(this.startDateTime);
-//    }
-//}
-

@@ -1,7 +1,7 @@
 package com.presta.infrastructure.persistence.adapters.availability;
 
 import com.presta.domain.model.AvailabilityRule;
-import com.presta.domain.port.in.availability.AvailabilityQueryPort;
+import com.presta.domain.port.out.AvailabilityRuleRepositoryPort;
 import com.presta.infrastructure.persistence.entities.AvailabilityRuleEntity;
 import com.presta.infrastructure.persistence.mapper.availability.AvailabilityRuleMapper;
 import com.presta.infrastructure.persistence.repositories.availability.JpaAvailabilityRuleRepository;
@@ -10,11 +10,12 @@ import org.springframework.stereotype.Repository;
 import jakarta.transaction.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
 @Transactional
-public class AvailabilityRepositoryAdapter implements AvailabilityQueryPort {
+public class AvailabilityRepositoryAdapter implements AvailabilityRuleRepositoryPort {
 
     private final JpaAvailabilityRuleRepository jpaAvailabilityRuleRepository;
     private final JpaBreakTimeRepository jpaBreakTimeRepository;
@@ -42,6 +43,16 @@ public class AvailabilityRepositoryAdapter implements AvailabilityQueryPort {
         return this.availabilityRuleMapper.toDomain(
                 this.jpaAvailabilityRuleRepository.save(availabilityRuleEntity)
         );
+    }
+
+    @Override
+    public Optional<AvailabilityRule> findById(UUID id) {
+        return Optional.empty();
+    }
+
+    @Override
+    public void deleteById(UUID id) {
+
     }
 
 }

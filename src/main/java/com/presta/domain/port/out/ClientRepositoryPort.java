@@ -1,9 +1,9 @@
-package com.presta.domain.port.in.client;
+package com.presta.domain.port.out;
 
 import com.presta.domain.model.Client;
 import org.springframework.data.domain.Page;
 
-public interface ClientQueryPort {
+public interface ClientRepositoryPort {
 
     record ClientSearchCriteria(
             String name,
@@ -14,4 +14,5 @@ public interface ClientQueryPort {
     ) {}
 
     Page<Client> searchClients(ClientSearchCriteria criteria);
+
 }

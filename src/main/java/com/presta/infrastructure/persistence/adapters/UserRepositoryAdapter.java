@@ -159,7 +159,7 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
 
     @Override
     @Transactional
-    public Client saveClient(Client client) {
+    public void saveClient(Client client) {
         // Le User DOIT exister avant de créer un Client
         UserEntity userEntity = userJpaRepository.findById(client.id())
                 .orElseThrow(() -> new IllegalStateException(
@@ -190,7 +190,7 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
 
         entityManager.flush();
 
-        return toDomainClient(clientEntity);
+        toDomainClient(clientEntity);
     }
 
     @Override

@@ -4,7 +4,8 @@ package com.presta.application.config;
 import com.presta.domain.port.in.UserProfilePort;
 import com.presta.domain.port.in.UserRegistrationPort;
 import com.presta.domain.port.in.UserSyncPort;
-import com.presta.domain.port.out.UserRepositoryPort;
+import com.presta.domain.port.out.*;
+import com.presta.domain.service.SlotGeneratorService;
 import com.presta.domain.service.UserProfileDomainService;
 import com.presta.domain.service.UserRegistrationDomainService;
 import com.presta.domain.service.UserSyncDomainService;
@@ -26,6 +27,21 @@ public class DomainConfiguration {
     @Bean
     public UserSyncPort userSyncService(UserRepositoryPort userRepositoryPort) {
         return new UserSyncDomainService(userRepositoryPort);
+    }
+
+    @Bean
+    public SlotGeneratorService slotGeneratorService(
+            AvailabilityRuleRepositoryPort availabilityRuleRepositoryPort,
+            UnavailabilityRuleRepositoryPort unavailabilityRuleRepositoryPort,
+            AppointmentRepositoryPort appointmentRepositoryPort,
+            ContractorRepositoryPort contractorRepositoryPort
+    ){
+        return new SlotGeneratorService(
+                availabilityRuleRepositoryPort,
+                unavailabilityRuleRepositoryPort,
+                appointmentRepositoryPort,
+                contractorRepositoryPort
+        );
     }
 
 

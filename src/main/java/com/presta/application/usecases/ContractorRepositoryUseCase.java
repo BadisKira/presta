@@ -2,7 +2,7 @@ package com.presta.application.usecases;
 
 import com.presta.domain.model.Assignment;
 import com.presta.domain.model.Contractor;
-import com.presta.domain.port.in.contractor.ContractorQueryPort;
+import com.presta.domain.port.out.ContractorRepositoryPort;
 import com.presta.domain.port.out.AssignmentPort;
 import com.presta.domain.port.out.UserRepositoryPort;
 import org.springframework.data.domain.Page;
@@ -11,17 +11,15 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 
-import javax.swing.text.html.Option;
-import java.util.Optional;
 import java.util.UUID;
 
 @Component
-public class ContractorQueryUseCase implements ContractorQueryPort {
+public class ContractorRepositoryUseCase implements ContractorRepositoryPort {
 
     private final UserRepositoryPort userRepositoryPort;
     private final AssignmentPort assignmentPort;
 
-    public ContractorQueryUseCase(UserRepositoryPort userRepositoryPort, AssignmentPort assignmentPort) {
+    public ContractorRepositoryUseCase(UserRepositoryPort userRepositoryPort, AssignmentPort assignmentPort) {
         this.userRepositoryPort = userRepositoryPort;
         this.assignmentPort = assignmentPort;
     }

@@ -1,7 +1,7 @@
 package com.presta.infrastructure.web.controllers.user;
 
 import com.presta.domain.model.Contractor;
-import com.presta.domain.port.in.contractor.ContractorQueryPort;
+import com.presta.domain.port.out.ContractorRepositoryPort;
 import com.presta.infrastructure.web.dtos.contractor.ContractorDto;
 import com.presta.infrastructure.web.dtos.contractor.UpdateContractorRequest;
 import jakarta.validation.Valid;
@@ -16,10 +16,10 @@ import java.util.UUID;
 @RequestMapping("/api/contractors")
 public class ContractorController {
 
-    private final ContractorQueryPort contractorQueryPort;
+    private final ContractorRepositoryPort contractorRepositoryPort;
 
-    public ContractorController(ContractorQueryPort contractorQueryPort) {
-        this.contractorQueryPort = contractorQueryPort;
+    public ContractorController(ContractorRepositoryPort contractorRepositoryPort) {
+        this.contractorRepositoryPort = contractorRepositoryPort;
     }
 
     @GetMapping
@@ -31,12 +31,12 @@ public class ContractorController {
             @RequestParam(defaultValue = "id") String sortBy,
             @RequestParam(defaultValue = "asc") String sortDirection
     ) {
-        ContractorQueryPort.ContractorSearchCriteria criteria =
-                new ContractorQueryPort.ContractorSearchCriteria(
+        ContractorRepositoryPort.ContractorSearchCriteria criteria =
+                new ContractorRepositoryPort.ContractorSearchCriteria(
                         name, speciality, page, size, sortBy, sortDirection
                 );
 
-        Page<Contractor> contractors = contractorQueryPort.searchContractors(criteria);
+        Page<Contractor> contractors = contractorRepositoryPort.searchContractors(criteria);
         return ResponseEntity.ok(contractors);
     }
 
@@ -47,7 +47,7 @@ public class ContractorController {
             @PathVariable UUID id,
             @Valid @RequestBody UpdateContractorRequest request) {
 
-        var updatedContractor = contractorQueryPort.updateContractor(
+        var updatedContractor = contractorRepositoryPort.updateContractor(
                 id,
                 request.address(),
                 request.assignmentId(),
