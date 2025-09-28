@@ -11,6 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @Component
@@ -18,6 +19,7 @@ public class ContractorRepositoryUseCase implements ContractorRepositoryPort {
 
     private final UserRepositoryPort userRepositoryPort;
     private final AssignmentPort assignmentPort;
+
 
     public ContractorRepositoryUseCase(UserRepositoryPort userRepositoryPort, AssignmentPort assignmentPort) {
         this.userRepositoryPort = userRepositoryPort;
@@ -34,6 +36,8 @@ public class ContractorRepositoryUseCase implements ContractorRepositoryPort {
         return userRepositoryPort.findContractors(
                 criteria.name(),
                 criteria.speciality(),
+                criteria.assignmentId(),
+                criteria.address(),
                 pageable
         );
     }
@@ -67,6 +71,11 @@ public class ContractorRepositoryUseCase implements ContractorRepositoryPort {
     @Override
     public boolean isActive(UUID contractorId) {
         return false;
+    }
+
+    @Override
+    public Optional<Contractor> findById(UUID id) {
+        return this.userRepositoryPort.findContractorById(id);
     }
 
     private Sort createSort(String sortBy, String sortDirection) {

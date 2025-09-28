@@ -18,4 +18,5 @@ public interface UserAuthenticationPort {
 
     Optional<AuthenticatedUser> getCurrentAuthenticatedUser();
     List<String> getUserRoles(KeycloakUserId keycloakId);
+    void getMe();
 }

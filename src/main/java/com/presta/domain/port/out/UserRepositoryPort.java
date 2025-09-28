@@ -31,7 +31,7 @@ public interface UserRepositoryPort {
     Optional<Contractor> findContractorById(UUID id);
 
 
-    Page<Contractor> findContractors(String name, String speciality, Pageable pageable);
+    Page<Contractor> findContractors(String name, String speciality, String assignmentId, String address, Pageable pageable);
     Page<Client> findClients(String name, Pageable pageable);
 
 }

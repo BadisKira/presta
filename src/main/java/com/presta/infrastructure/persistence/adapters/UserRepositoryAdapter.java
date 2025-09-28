@@ -21,6 +21,7 @@ import com.presta.infrastructure.persistence.repositories.user.JpaUserRepository
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.JoinType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -257,22 +258,45 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
     }
 
     @Override
-    public Page<Contractor> findContractors(String name, String speciality, Pageable pageable) {
+    public Page<Contractor> findContractors(String name, String speciality, String assignmentId, String address, Pageable pageable) {
         Specification<ContractorEntity> spec = Specification.where(null);
 
+        // Recherche par nom (fullName)
         if (name != null && !name.isBlank()) {
             spec = spec.and((root, query, cb) ->
                     cb.like(cb.lower(root.get("fullName")), "%" + name.toLowerCase() + "%"));
         }
 
+        // Recherche par spécialité
         if (speciality != null && !speciality.isBlank()) {
             spec = spec.and((root, query, cb) ->
                     cb.like(cb.lower(root.get("speciality")), "%" + speciality.toLowerCase() + "%"));
         }
 
+        // Recherche par assignmentId (avec jointure)
+        if (assignmentId != null && !assignmentId.isBlank()) {
+            spec = spec.and((root, query, cb) -> {
+                Join<ContractorEntity, AssignmentEntity> assignmentJoin = root.join("assignment", JoinType.INNER);
+                try {
+                    UUID assignmentUuid = UUID.fromString(assignmentId);
+                    return cb.equal(assignmentJoin.get("id"), assignmentUuid);
+                } catch (IllegalArgumentException e) {
+                    // Si l'assignmentId n'est pas un UUID valide, on peut aussi chercher par nom d'assignment
+                    return cb.like(cb.lower(assignmentJoin.get("name")), "%" + assignmentId.toLowerCase() + "%");
+                }
+            });
+        }
+
+        // Recherche par adresse
+        if (address != null && !address.isBlank()) {
+            spec = spec.and((root, query, cb) ->
+                    cb.like(cb.lower(root.get("address")), "%" + address.toLowerCase() + "%"));
+        }
+
         Page<ContractorEntity> entityPage = contractorJpaRepository.findAll(spec, pageable);
         return entityPage.map(userMapper::toDomain);
     }
+
 
     @Override
     public Page<Client> findClients(String name, Pageable pageable) {

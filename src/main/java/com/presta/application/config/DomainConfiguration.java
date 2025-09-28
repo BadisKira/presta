@@ -7,18 +7,12 @@ import com.presta.domain.port.in.UserSyncPort;
 import com.presta.domain.port.out.*;
 import com.presta.domain.service.SlotGeneratorService;
 import com.presta.domain.service.UserProfileDomainService;
-import com.presta.domain.service.UserRegistrationDomainService;
 import com.presta.domain.service.UserSyncDomainService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class DomainConfiguration {
-    @Bean
-    public UserRegistrationPort userRegistrationService(UserRepositoryPort userRepositoryPort) {
-        return new UserRegistrationDomainService(userRepositoryPort);
-    }
-
     @Bean
     public UserProfilePort userProfileService(UserRepositoryPort userRepositoryPort) {
         return new UserProfileDomainService(userRepositoryPort);

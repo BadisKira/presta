@@ -1,10 +1,11 @@
 import { Component } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { RippleModule } from 'primeng/ripple';
 
 @Component({
     selector: 'hero-component',
-    imports: [ButtonModule, RippleModule],
+    imports: [ButtonModule, RippleModule,RouterLink],
     template: `
          <div
             id="hero"
@@ -13,13 +14,15 @@ import { RippleModule } from 'primeng/ripple';
         >
             <div class="mx-6 md:mx-20 mt-0 md:mt-6">
                 <h1 class="text-6xl font-bold text-gray-900 leading-tight">
-                    <span class="font-light block">Réservez vos rendez-vous</span>
+                    
+                <span class="font-light block" >
+                    Réservez vos rendez-vous</span>
                     en toute simplicité
                 </h1>
                 <p class="font-normal text-2xl leading-normal md:mt-4 text-gray-700">
                     Connectez-vous avec des professionnels qualifiés et réservez vos rendez-vous en ligne selon leurs disponibilités. Une solution moderne pour optimiser votre temps.
                 </p>
-                <button pButton pRipple [rounded]="true" type="button" label="Réserver maintenant" class="text-xl! mt-8 px-4!"></button>
+                <button pButton pRipple [routerLink]="['search']" [rounded]="true" type="button" label="Réserver maintenant" class="text-xl! mt-8 px-4!"></button>
             </div>
             <div class="flex justify-center md:justify-end">
                 <img src="https://primefaces.org/cdn/templates/sakai/landing/screen-1.png" alt="Interface de réservation" class="w-9/12 md:w-auto" />

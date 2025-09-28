@@ -12,7 +12,7 @@ CREATE TABLE presta.availability_rule (
 
     CONSTRAINT fk_contractor_availability
         FOREIGN KEY (contractor_id)
-        REFERENCES presta.contractorAccount(id) ON DELETE CASCADE,
+        REFERENCES presta.contractor_account(id) ON DELETE CASCADE,
 
     CONSTRAINT check_time_coherence
         CHECK (end_time > start_time),
@@ -51,7 +51,7 @@ CREATE TABLE presta.unavailability_rule (
 
     CONSTRAINT fk_contractor_unavailability
         FOREIGN KEY (contractor_id)
-        REFERENCES presta.contractorAccount(id) ON DELETE CASCADE,
+        REFERENCES presta.contractor_account(id) ON DELETE CASCADE,
 
     CONSTRAINT check_date_coherence
         CHECK (end_date >= start_date),

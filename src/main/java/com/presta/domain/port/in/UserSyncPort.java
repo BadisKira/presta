@@ -12,9 +12,8 @@ public interface UserSyncPort {
             CLIENT, CONTRACTOR
         }
 
-        void syncUser(UserProfile profile, ContactInfo contact, List<UserRole> roles);
-        void syncUser(KeycloakUserId keycloakUserId,UserProfile profile, ContactInfo contact, List<UserRole> roles);
+        void syncUser(KeycloakUserId keycloakUserId,UserProfile profile, ContactInfo contact, UserRole role);
 
-        boolean userExists(KeycloakUserId keycloakId);
+
 
 }

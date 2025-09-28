@@ -15,10 +15,6 @@ export class App implements OnInit {
   protected readonly title = signal('presta-client');
   private keycloakService = inject(KeycloakService);
 
-  ngOnInit(): void {
-    //localStorage.setItem("role","ADMIN")
-    if (this.keycloakService.isLoggedIn() && localStorage.getItem("role") != "ADMIN") {
-      this.keycloakService.syncUserWithBackend();
-    }
+  ngOnInit(): void {    
   }
 }

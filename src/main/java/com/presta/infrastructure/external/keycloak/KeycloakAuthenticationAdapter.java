@@ -98,5 +98,10 @@ public class KeycloakAuthenticationAdapter implements UserAuthenticationPort {
         return List.of();
     }
 
+    @Override
+    public void getMe() {
+
+    }
+
 
 }
