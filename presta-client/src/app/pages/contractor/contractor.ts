@@ -1,8 +1,9 @@
 import { Component } from '@angular/core';
+import { RouterOutlet } from '@angular/router';
 
 @Component({
   selector: 'app-contractor',
-  imports: [],
+  imports: [RouterOutlet],
   templateUrl: './contractor.html',
   styleUrl: './contractor.scss'
 })

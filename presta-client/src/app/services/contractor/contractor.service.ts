@@ -1,9 +1,10 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable, map } from 'rxjs';
+import { Observable, catchError, map, of } from 'rxjs';
 import { PagedResponse } from '../../models/pagination.model';
-import { Contractor } from '../../models/contractor.model';
+import { Contractor, UpdateContractorRequest } from '../../models/contractor.model';
 import { environment } from '../../../environment';
+import { MessageService } from 'primeng/api';
 
 // Interfaces de pagination
 interface PageRequest {
@@ -28,19 +29,20 @@ export interface SearchFilters {
   providedIn: 'root'
 })
 export class ContractorService {
-    
+
   private _url_base = environment.apiUrl + '/api/contractors';
-  constructor(private http: HttpClient) {}
+  private messageService = inject(MessageService);
+  constructor(private http: HttpClient) { }
 
   /**
    * Recherche de contractors avec pagination complète
    */
   searchContractors(
-    filters: SearchFilters = {}, 
+    filters: SearchFilters = {},
     pageRequest: PageRequest = { page: 0, size: 10, sortBy: 'id', sortDirection: 'asc' }
   ): Observable<PagedResponse<Contractor>> {
     let params = new HttpParams();
-    
+
     // Paramètres de recherche (tous optionnels)
     if (filters.name?.trim()) {
       params = params.set('name', filters.name.trim());
@@ -64,7 +66,7 @@ export class ContractorService {
     return this.http.get<PagedResponse<Contractor>>(this._url_base, { params });
   }
 
- 
+
   /**
    * Recherche par ID spécifique
    */
@@ -79,9 +81,9 @@ export class ContractorService {
    */
   hasActiveFilters(filters: SearchFilters): boolean {
     return !!(
-      filters.name?.trim() || 
-      filters.speciality?.trim() || 
-      filters.assignmentId?.trim() || 
+      filters.name?.trim() ||
+      filters.speciality?.trim() ||
+      filters.assignmentId?.trim() ||
       filters.address?.trim()
     );
   }
@@ -96,5 +98,21 @@ export class ContractorService {
     sortDirection: 'asc' | 'desc' = 'asc'
   ): PageRequest {
     return { page, size, sortBy, sortDirection };
+  }
+
+
+  updateInformation(id: string, request: UpdateContractorRequest) {
+    return this.http.patch<Contractor>(`${this._url_base}/${id}`, {
+      ...request
+    }).pipe(
+      catchError(error => {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Erreur service',
+          detail: "Erreur lors de la complétion des informations du contractor "
+        });
+        return of([]);
+      })
+    )
   }
 }

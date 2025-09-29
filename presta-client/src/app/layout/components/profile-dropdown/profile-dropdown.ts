@@ -134,7 +134,6 @@ export class ProfileDropdownComponent implements OnInit {
 
   readonly menuItems = computed<MenuItem[]>(() => {
     const profile = this.currentProfile();
-    console.log('Menu items for profile:', profile);
     const type = this.profileType();
     
     const baseItems: MenuItem[] = [
@@ -221,12 +220,9 @@ export class ProfileDropdownComponent implements OnInit {
   private async loadCurrentProfile(): Promise<void> {
     const isLoggedIn = await this.keycloakService.isLoggedIn();
     if (!isLoggedIn) return;
-
     this.currentProfile.set(null); // Réinitialiser avant de charger
-
     this.userManagementService.getCurrentUser().subscribe({
       next: (user) => {
-        console.log('Utilisateur courant chargé:', user);
         this.currentProfile.set(user);
       },
       error: (err) => {

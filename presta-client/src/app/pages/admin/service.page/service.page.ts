@@ -126,7 +126,6 @@ export class ServicePage implements OnInit {
                 this.assignments.set(response.content);
                 this.totalRecords.set(response.totalElements);
                 this.loading.set(false);
-                console.log('Assignments chargés:', response);
             },
             error: (error) => {
                 this.loading.set(false);

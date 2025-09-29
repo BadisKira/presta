@@ -56,8 +56,8 @@ public class ContractorController {
 
 
     @PatchMapping("/{id}")
-    //@PreAuthorize("hasRole('CONTRACTOR') and #id == authentication.principal.id or hasRole('ADMIN')")
-    public ResponseEntity<?> updateContractor(
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<ContractorDto> updateContractor(
             @PathVariable UUID id,
             @Valid @RequestBody UpdateContractorRequest request) {
 
@@ -68,10 +68,7 @@ public class ContractorController {
                 request.speciality()
         );
 
-        return ResponseEntity.ok(Map.of(
-                "message", "Contractor mis à jour avec succès",
-                "contractor", ContractorDto.fromDomain(updatedContractor)
-        ));
+        return ResponseEntity.ok(ContractorDto.fromDomain(updatedContractor));
     }
 
     @GetMapping(value = "/me")

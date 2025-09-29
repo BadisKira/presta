@@ -31,11 +31,12 @@ public class UserEntity {
 
     public UserEntity() {}
 
-    public UserEntity(UUID keycloakId, String firstName, String lastName, String email) {
+    public UserEntity(UUID keycloakId, String firstName, String lastName, String email,boolean isActive) {
         this.keycloakId = keycloakId;
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
+        this.isActive = isActive;
     }
 
 

@@ -38,11 +38,11 @@ export class AssignemntService {
   );
   }
 
-  saveAssignment(assignemnt:Assignment) {
-    return this.http.post<Assignment>(this._url_base,{
+  saveAssignment(assignemnt: Assignment) {
+    return this.http.post<Assignment>(this._url_base, {
       ...assignemnt
     }).pipe(
-       catchError(error => {
+      catchError(error => {
         this.messageService.add({
           severity: 'error',
           summary: 'Erreur service',
@@ -55,11 +55,11 @@ export class AssignemntService {
 
 
 
-  updateAssignment(assignemnt:Assignment) {
-    return this.http.put<Assignment>(this._url_base,{
+  updateAssignment(assignemnt: Assignment) {
+    return this.http.put<Assignment>(this._url_base, {
       ...assignemnt
     }).pipe(
-       catchError(error => {
+      catchError(error => {
         this.messageService.add({
           severity: 'error',
           summary: 'Erreur service',
@@ -70,22 +70,22 @@ export class AssignemntService {
     )
   }
 
-  
+
   deleteAssignment(assignmentId: string) {
     return this.http.delete<Assignment>(this._url_base + `/${assignmentId}`).pipe(
-        catchError(error => {
-            this.messageService.add({
-                severity: 'error',
-                summary: 'Erreur service',
-                detail: "Erreur lors de la suppression du service"
-            });
-            return of(); 
-        })
+      catchError(error => {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Erreur service',
+          detail: "Erreur lors de la suppression du service"
+        });
+        return of();
+      })
     );
-}
+  }
 
 
-getAssignments(params?: AssignmentSearchParams): Observable<PagedResponse<Assignment>> {
+  getAssignments(params?: AssignmentSearchParams): Observable<PagedResponse<Assignment>> {
     let httpParams = new HttpParams();
 
     if (params) {
@@ -108,7 +108,6 @@ getAssignments(params?: AssignmentSearchParams): Observable<PagedResponse<Assign
 
     return this.http.get<PagedResponse<Assignment>>(this._url_base, { params: httpParams }).pipe(
       catchError(error => {
-        console.log(error);
         this.messageService.add({
           severity: 'error',
           summary: 'Erreur service',

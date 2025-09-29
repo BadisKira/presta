@@ -8,7 +8,7 @@ spring:
     name: presta
 
   datasource:
-    url: jdbc:postgresql://localhost:5433/presta-db
+    url: jdbc:postgresql://localhost:5432/presta-db
     username: admin
     password: admin
     name: presta-db

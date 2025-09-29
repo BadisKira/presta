@@ -9,7 +9,7 @@ export const routes: Routes = [
     },
     {
         path: 'search',
-        loadComponent: () => import('./pages/contractor-search/contractor-search').then(m => m.ContractorSearchPage),
+        loadComponent: () => import('./pages/contractor/contractor-search/contractor-search').then(m => m.ContractorSearchPage),
     },
     {
         path: 'admin',
@@ -30,12 +30,15 @@ export const routes: Routes = [
     {
         path: 'contractor',
         loadComponent: () => import('./pages/contractor/contractor').then(m => m.ContractorLayout),
-        canActivate: [authGuard],
+        //canActivate: [authGuard],
         children: [
-
+            {
+                path: 'complete-profile',
+                loadComponent: () => import('./pages/contractor/contractor-fill-information/contractor-fill-information').then(m => m.ContractorFillInformation)
+            }
         ]
     },
-{
+    {
         path: 'client',
         loadComponent: () => import('./pages/client/client').then(m => m.ClientLayout),
         canActivate: [authGuard],

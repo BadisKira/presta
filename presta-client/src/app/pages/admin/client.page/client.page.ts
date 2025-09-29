@@ -114,7 +114,6 @@ export class ClientPage implements OnInit {
         this.clients.set(response.content);
         this.totalRecords.set(response.totalElements);
         this.loading.set(false);
-        console.log('Clients chargés:', response);
       },
       error: (error) => {
         this.loading.set(false);

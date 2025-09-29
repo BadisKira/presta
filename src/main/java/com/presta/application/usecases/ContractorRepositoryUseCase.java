@@ -45,6 +45,7 @@ public class ContractorRepositoryUseCase implements ContractorRepositoryPort {
 
     @Override
     public Contractor updateContractor(UUID id, String address, UUID assignmentId, String speciality) {
+
         Contractor existingContractor = userRepositoryPort.findContractorById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Contractor non trouvé avec l'ID: " + id));
 

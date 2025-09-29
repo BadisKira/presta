@@ -20,14 +20,15 @@ import { Contractor } from '../../../models/contractor.model';
 import { Assignment } from '../../../models/assignment';
 import { ContractorService, SearchFilters } from '../../../services/contractor/contractor.service';
 import { AssignemntService } from '../../../services/assignment/assignemnt.service';
+import { AssignmentSelect } from '../assignment-select/assignment-select';
 
 @Component({
   selector: 'app-contractor-search-component',
   imports: [
     CommonModule, ReactiveFormsModule,
     InputTextModule, AutoCompleteModule,
-    ButtonModule, ProgressSpinnerModule,
-    Paginator,PaginatorModule, TagModule, RouterLink, CardModule, AvatarModule
+    ButtonModule, ProgressSpinnerModule, AssignmentSelect,
+    Paginator, PaginatorModule, TagModule, RouterLink, CardModule, AvatarModule
   ],
   templateUrl: './contractors-search.component.html',
 })
@@ -36,6 +37,7 @@ export class ContractorsSearchComponent {
   private readonly contractorService = inject(ContractorService);
   private readonly assignmentService = inject(AssignemntService);
   private readonly destroyRef = inject(DestroyRef);
+
 
   // Form
   readonly searchForm = this.fb.group({
@@ -59,7 +61,7 @@ export class ContractorsSearchComponent {
     ),
     { initialValue: [] as Assignment[] }
   );
-  
+
   readonly filteredAssignments = signal<Assignment[]>([]);
 
   constructor() {
@@ -81,7 +83,7 @@ export class ContractorsSearchComponent {
     effect(() => {
       const formValue = searchTrigger$();
       const assignmentId = formValue.assignment?.id;
-      
+
       const filters: SearchFilters = {
         name: formValue.fullName || undefined,
         address: formValue.address || undefined,
@@ -99,7 +101,7 @@ export class ContractorsSearchComponent {
 
   private search(filters: SearchFilters, pageRequest: any): void {
     this.loading.set(true);
-    
+
     this.contractorService.searchContractors(filters, pageRequest)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
@@ -119,10 +121,10 @@ export class ContractorsSearchComponent {
   filterAssignments(event: any): void {
     const query = (event?.query ?? '').toLowerCase();
     const allAssignments = this.assignments();
-    
+
     this.filteredAssignments.set(
-      query ? allAssignments.filter(a => a.name?.toLowerCase().includes(query)) 
-            : allAssignments
+      query ? allAssignments.filter(a => a.name?.toLowerCase().includes(query))
+        : allAssignments
     );
   }
 
@@ -146,7 +148,7 @@ export class ContractorsSearchComponent {
   initials(name?: string): string {
     if (!name?.trim()) return '?';
     const parts = name.trim().split(/\s+/);
-    return parts.length === 1 
+    return parts.length === 1
       ? parts[0][0].toUpperCase()
       : (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
   }
@@ -158,4 +160,13 @@ export class ContractorsSearchComponent {
     if (!this.hasResults() && !this.loading()) return 'Aucun résultat trouvé';
     return null;
   });
+
+
+  fillAssignment(event: Assignment | undefined) {
+    this.searchForm.patchValue({
+      assignment: event ?? null
+    });
+  }
+
+
 }

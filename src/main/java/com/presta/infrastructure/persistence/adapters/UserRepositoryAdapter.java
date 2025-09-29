@@ -83,7 +83,10 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
         } else {
             // CREATE nouvelle entité
             entity = createEntityFromUser(user);
+            entity.setIsActive(true);
         }
+
+
 
         UserEntity saved = userJpaRepository.save(entity);
         entityManager.flush(); // Force la synchronisation avec la DB
@@ -251,6 +254,8 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
         return toDomainContractor(contractorEntity);
     }
 
+
+
     @Override
     public Optional<Contractor> findContractorById(UUID id) {
         return contractorJpaRepository.findById(id)
@@ -327,7 +332,8 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
                 user.keycloakId().getValue(),
                 user.profile().getFirstName(),
                 user.profile().getLastName(),
-                user.contactInfo().email()
+                user.contactInfo().email(),
+                user.isActive()
         );
     }
 

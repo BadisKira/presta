@@ -24,18 +24,8 @@ public class DomainConfiguration {
     }
 
     @Bean
-    public SlotGeneratorService slotGeneratorService(
-            AvailabilityRuleRepositoryPort availabilityRuleRepositoryPort,
-            UnavailabilityRuleRepositoryPort unavailabilityRuleRepositoryPort,
-            AppointmentRepositoryPort appointmentRepositoryPort,
-            ContractorRepositoryPort contractorRepositoryPort
-    ){
-        return new SlotGeneratorService(
-                availabilityRuleRepositoryPort,
-                unavailabilityRuleRepositoryPort,
-                appointmentRepositoryPort,
-                contractorRepositoryPort
-        );
+    public SlotGeneratorService slotGeneratorService(){
+        return new SlotGeneratorService();
     }
 
 

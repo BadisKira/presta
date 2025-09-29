@@ -11,8 +11,8 @@ export interface Contractor {
 }
 
 export interface UpdateContractorRequest {
-  address?: string;
-  assignmentId?: string;
+  address: string;
+  assignmentId: string;
   speciality?: string;
 }
 

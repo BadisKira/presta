@@ -7,375 +7,371 @@ import com.presta.domain.model.valueobject.AppointmentStatus;
 import com.presta.domain.model.valueobject.AvailabilityStatus;
 import com.presta.domain.model.valueobject.AvailableSlot;
 import com.presta.domain.model.valueobject.TimeSlot;
-import com.presta.domain.port.out.*;
+import com.presta.domain.port.out.SlotGeneratorPort;
+
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * Domain Service PUR - Implémente toute la logique métier de génération des créneaux
+ * Ne dépend d'AUCUN repository, travaille uniquement avec les entités du domaine
+ */
+
 public class SlotGeneratorService implements SlotGeneratorPort {
 
-    private final AvailabilityRuleRepositoryPort availabilityRuleRepositoryPort;
-    private final UnavailabilityRuleRepositoryPort unavailabilityRuleRepositoryPort;
-    private final AppointmentRepositoryPort appointmentRepositoryPort;
-    private final ContractorRepositoryPort contractorRepositoryPort;
+    // Configuration métier (peut être externalisée)
+    private static final int MIN_SLOT_DURATION = 30; // minutes
+    private static final int MAX_SLOT_DURATION = 240; // 4 heures
+    private static final int MAX_BOOKING_ADVANCE_DAYS = 90; // 3 mois
 
-    public SlotGeneratorService(
-            AvailabilityRuleRepositoryPort availabilityRuleRepositoryPort,
-            UnavailabilityRuleRepositoryPort unavailabilityRuleRepositoryPort,
-            AppointmentRepositoryPort appointmentRepositoryPort,
-            ContractorRepositoryPort contractorRepositoryPort) {
-        this.availabilityRuleRepositoryPort = availabilityRuleRepositoryPort;
-        this.unavailabilityRuleRepositoryPort = unavailabilityRuleRepositoryPort;
-        this.appointmentRepositoryPort = appointmentRepositoryPort;
-        this.contractorRepositoryPort = contractorRepositoryPort;
-    }
+    // ========== GÉNÉRATION DE CRÉNEAUX ==========
 
     @Override
-    public List<AvailableSlot> generateAvailableSlots(
-            UUID contractorId,
+    public List<TimeSlot> generateRawSlots(
+            List<AvailabilityRule> availabilityRules,
             LocalDate startDate,
             LocalDate endDate) {
 
-        // Vérifications préalables
-        if (!contractorRepositoryPort.isActive(contractorId)) {
+        if (availabilityRules == null || availabilityRules.isEmpty()) {
             return Collections.emptyList();
         }
 
-        List<AvailabilityRule> activeRules = availabilityRuleRepositoryPort
-                .findActiveByContractorId(contractorId);
-        if (activeRules.isEmpty()) {
+        if (startDate == null || endDate == null || startDate.isAfter(endDate)) {
             return Collections.emptyList();
         }
 
-        // Génération des créneaux bruts
-        List<TimeSlot> rawSlots = generateRawSlots(activeRules, startDate, endDate);
+        List<TimeSlot> allSlots = new ArrayList<>();
+        LocalDate currentDate = startDate;
 
-        // Récupération des contraintes
-        List<UnavailabilityRule> unavailabilities = unavailabilityRuleRepositoryPort
-                .findByContractorIdAndPeriod(contractorId, startDate, endDate);
+        // Pour chaque jour de la période
+        while (!currentDate.isAfter(endDate)) {
+            LocalDate day = currentDate;
 
-        List<Appointment> existingAppointments = appointmentRepositoryPort
-                .findActiveByContractorIdAndPeriod(contractorId,
-                        startDate.atStartOfDay(),
-                        endDate.plusDays(1).atStartOfDay());
+            // Pour chaque règle de disponibilité
+            for (AvailabilityRule rule : availabilityRules) {
+                if (rule.isActive()) {
+                    // generateSlotsForDay gère déjà les BreakTime
+                    List<TimeSlot> daySlots = rule.generateSlotsForDay(day);
+                    allSlots.addAll(daySlots);
+                }
+            }
 
-        // Application des contraintes et marquage
-        return markSlotsAvailability(contractorId, rawSlots, unavailabilities, existingAppointments);
+            currentDate = currentDate.plusDays(1);
+        }
+
+        // Trier par ordre chronologique
+        return sortSlotsByDateTime(allSlots);
+    }
+
+    // ========== MARQUAGE ET FILTRAGE ==========
+
+    @Override
+    public List<AvailableSlot> markSlotsAvailability(
+            UUID contractorId,
+            List<TimeSlot> rawSlots,
+            List<UnavailabilityRule> unavailabilityRules,
+            List<Appointment> existingAppointments) {
+
+        if (contractorId == null || rawSlots == null || rawSlots.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        // Préparer les listes pour éviter les NPE
+        List<UnavailabilityRule> unavailabilities =
+                unavailabilityRules != null ? unavailabilityRules : Collections.emptyList();
+
+        List<Appointment> appointments =
+                existingAppointments != null ? existingAppointments : Collections.emptyList();
+
+        // Marquer chaque créneau avec son statut
+        return rawSlots.stream()
+                .map(slot -> {
+                    AvailabilityStatus status = determineSlotStatus(slot, unavailabilities, appointments);
+                    return new AvailableSlot(contractorId, slot, status);
+                })
+                .collect(Collectors.toList());
     }
 
     @Override
-    public List<TimeSlot> findOnlyAvailableSlots(
-            UUID contractorId,
-            LocalDate startDate,
-            LocalDate endDate) {
+    public AvailabilityStatus determineSlotStatus(
+            TimeSlot slot,
+            List<UnavailabilityRule> unavailabilityRules,
+            List<Appointment> appointments) {
 
-        return generateAvailableSlots(contractorId, startDate, endDate)
-                .stream()
+        // Ordre d'évaluation important pour la priorité des statuts
+
+        // 1. Vérifier si le créneau est dans le passé
+        if (slot.isInPast()) {
+            return AvailabilityStatus.PAST;
+        }
+
+        // 2. Vérifier les indisponibilités (vacances, absences)
+        if (isBlockedByAnyUnavailability(slot, unavailabilityRules)) {
+            return AvailabilityStatus.UNAVAILABLE;
+        }
+
+        // 3. Vérifier les rendez-vous existants
+        if (isBlockedByAnyAppointment(slot, appointments)) {
+            return AvailabilityStatus.BOOKED;
+        }
+
+        // 4. Le créneau est disponible
+        return AvailabilityStatus.AVAILABLE;
+    }
+
+    // ========== EXTRACTION ET RECHERCHE ==========
+
+    @Override
+    public List<TimeSlot> extractAvailableSlots(List<AvailableSlot> markedSlots) {
+        if (markedSlots == null || markedSlots.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        return markedSlots.stream()
                 .filter(slot -> slot.status() == AvailabilityStatus.AVAILABLE)
                 .map(AvailableSlot::timeSlot)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public boolean isSlotAvailable(
-            UUID contractorId,
-            LocalDateTime startDateTime,
-            int duration) {
+    public List<TimeSlot> filterSlotsByStatus(
+            List<AvailableSlot> markedSlots,
+            AvailabilityStatus status) {
 
-        TimeSlot requestedSlot = new TimeSlot(startDateTime, duration);
-        LocalDate date = startDateTime.toLocalDate();
-
-        return generateAvailableSlots(contractorId, date, date)
-                .stream()
-                .anyMatch(slot -> slot.timeSlot().equals(requestedSlot) &&
-                        slot.status() == AvailabilityStatus.AVAILABLE);
-    }
-
-    // ========== MÉTHODES PRIVÉES - LOGIQUE MÉTIER ==========
-
-    private List<TimeSlot> generateRawSlots(
-            List<AvailabilityRule> rules,
-            LocalDate startDate,
-            LocalDate endDate) {
-
-        List<TimeSlot> allSlots = new ArrayList<>();
-
-        LocalDate currentDate = startDate;
-        while (!currentDate.isAfter(endDate)) {
-            for (AvailabilityRule rule : rules) {
-                allSlots.addAll(rule.generateSlotsForDay(currentDate));
-            }
-            currentDate = currentDate.plusDays(1);
+        if (markedSlots == null || status == null) {
+            return Collections.emptyList();
         }
 
-        allSlots.sort(Comparator.comparing(TimeSlot::startDateTime));
-        return allSlots;
-    }
-
-    private List<AvailableSlot> markSlotsAvailability(
-            UUID contractorId,
-            List<TimeSlot> rawSlots,
-            List<UnavailabilityRule> unavailabilities,
-            List<Appointment> appointments) {
-
-        return rawSlots.stream()
-                .map(slot -> new AvailableSlot(
-                        contractorId,
-                        slot,
-                        determineSlotStatus(slot, unavailabilities, appointments)))
+        return markedSlots.stream()
+                .filter(slot -> slot.status() == status)
+                .map(AvailableSlot::timeSlot)
                 .collect(Collectors.toList());
     }
 
-    private AvailabilityStatus determineSlotStatus(
+    @Override
+    public Optional<TimeSlot> findNextAvailableSlot(
+            List<AvailableSlot> availableSlots,
+            LocalDateTime afterDateTime,
+            int requiredDuration) {
+
+        if (availableSlots == null || afterDateTime == null) {
+            return Optional.empty();
+        }
+
+        return availableSlots.stream()
+                .filter(slot -> slot.status() == AvailabilityStatus.AVAILABLE)
+                .map(AvailableSlot::timeSlot)
+                .filter(slot -> slot.startDateTime().isAfter(afterDateTime))
+                .filter(slot -> slot.duration() >= requiredDuration)
+                .findFirst();
+    }
+
+    @Override
+    public List<TimeSlot> findSlotsByMinDuration(
+            List<AvailableSlot> availableSlots,
+            int minDuration) {
+
+        if (availableSlots == null) {
+            return Collections.emptyList();
+        }
+
+        return availableSlots.stream()
+                .filter(slot -> slot.status() == AvailabilityStatus.AVAILABLE)
+                .map(AvailableSlot::timeSlot)
+                .filter(slot -> slot.duration() >= minDuration)
+                .collect(Collectors.toList());
+    }
+
+    // ========== VALIDATION ==========
+
+    @Override
+    public boolean isSpecificSlotAvailable(
+            TimeSlot requestedSlot,
+            List<AvailableSlot> availableSlots) {
+
+        if (requestedSlot == null || availableSlots == null) {
+            return false;
+        }
+
+        return availableSlots.stream()
+                .anyMatch(slot ->
+                        slot.timeSlot().equals(requestedSlot) &&
+                                slot.status() == AvailabilityStatus.AVAILABLE
+                );
+    }
+
+    @Override
+    public boolean isSlotBookable(TimeSlot slot) {
+        if (slot == null) {
+            return false;
+        }
+
+        // Le créneau ne doit pas être dans le passé
+        if (slot.isInPast()) {
+            return false;
+        }
+
+        // Vérifier la durée minimale
+        if (slot.duration() < MIN_SLOT_DURATION) {
+            return false;
+        }
+
+        // Vérifier la durée maximale
+        if (slot.duration() > MAX_SLOT_DURATION) {
+            return false;
+        }
+
+        // Vérifier que ce n'est pas trop loin dans le futur
+        if (slot.startDateTime().isAfter(LocalDateTime.now().plusDays(MAX_BOOKING_ADVANCE_DAYS))) {
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public boolean isAppointmentBlocking(Appointment appointment, TimeSlot slot) {
+        if (appointment == null || slot == null) {
+            return false;
+        }
+
+        // Seuls les rendez-vous actifs bloquent les créneaux
+        AppointmentStatus status = appointment.getStatus();
+        boolean isActive = status == AppointmentStatus.PENDING ||
+                status == AppointmentStatus.CONFIRMED;
+
+        return isActive && appointment.getSlot().overlaps(slot);
+    }
+
+    @Override
+    public boolean isUnavailabilityBlocking(UnavailabilityRule unavailabilityRule, TimeSlot slot) {
+        if (unavailabilityRule == null || slot == null) {
+            return false;
+        }
+
+        return unavailabilityRule.blocksTimeSlot(slot);
+    }
+
+    // ========== UTILITAIRES ==========
+
+    @Override
+    public Map<LocalDate, List<TimeSlot>> groupSlotsByDay(List<TimeSlot> slots) {
+        if (slots == null || slots.isEmpty()) {
+            return Collections.emptyMap();
+        }
+
+        return slots.stream()
+                .collect(Collectors.groupingBy(
+                        slot -> slot.startDateTime().toLocalDate(),
+                        TreeMap::new, // Pour avoir les dates triées
+                        Collectors.toList()
+                ));
+    }
+
+    @Override
+    public List<TimeSlot> sortSlotsByDateTime(List<TimeSlot> slots) {
+        if (slots == null || slots.isEmpty()) {
+            return slots;
+        }
+
+        return slots.stream()
+                .sorted(Comparator.comparing(TimeSlot::startDateTime))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public SlotStatistics calculateStatistics(List<AvailableSlot> availableSlots) {
+        if (availableSlots == null || availableSlots.isEmpty()) {
+            return new SlotStatistics(0, 0, 0, 0, 0, 0.0, 0.0);
+        }
+
+        int total = availableSlots.size();
+
+        Map<AvailabilityStatus, Long> statusCounts = availableSlots.stream()
+                .collect(Collectors.groupingBy(
+                        AvailableSlot::status,
+                        Collectors.counting()
+                ));
+
+        int available = statusCounts.getOrDefault(AvailabilityStatus.AVAILABLE, 0L).intValue();
+        int booked = statusCounts.getOrDefault(AvailabilityStatus.BOOKED, 0L).intValue();
+        int unavailable = statusCounts.getOrDefault(AvailabilityStatus.UNAVAILABLE, 0L).intValue();
+        int past = statusCounts.getOrDefault(AvailabilityStatus.PAST, 0L).intValue();
+
+        double availabilityRate = total > 0 ? (double) available / total * 100 : 0.0;
+        double bookingRate = (available + booked) > 0 ?
+                (double) booked / (available + booked) * 100 : 0.0;
+
+        return new SlotStatistics(
+                total,
+                available,
+                booked,
+                unavailable,
+                past,
+                availabilityRate,
+                bookingRate
+        );
+    }
+
+    @Override
+    public List<TimeSlot> mergeContiguousSlots(List<TimeSlot> slots) {
+        if (slots == null || slots.size() <= 1) {
+            return slots;
+        }
+
+        // Trier d'abord les créneaux
+        List<TimeSlot> sortedSlots = sortSlotsByDateTime(slots);
+        List<TimeSlot> merged = new ArrayList<>();
+
+        TimeSlot current = sortedSlots.get(0);
+
+        for (int i = 1; i < sortedSlots.size(); i++) {
+            TimeSlot next = sortedSlots.get(i);
+
+            // Vérifier si les créneaux sont contigus
+            if (current.getEndDateTime().equals(next.startDateTime())) {
+                // Fusionner les créneaux
+                current = new TimeSlot(
+                        current.startDateTime(),
+                        current.duration() + next.duration()
+                );
+            } else {
+                merged.add(current);
+                current = next;
+            }
+        }
+
+        merged.add(current);
+        return merged;
+    }
+
+    // ========== MÉTHODES PRIVÉES HELPER ==========
+
+    private boolean isBlockedByAnyUnavailability(
             TimeSlot slot,
-            List<UnavailabilityRule> unavailabilities,
+            List<UnavailabilityRule> unavailabilityRules) {
+
+        if (unavailabilityRules == null || unavailabilityRules.isEmpty()) {
+            return false;
+        }
+
+        return unavailabilityRules.stream()
+                .anyMatch(rule -> isUnavailabilityBlocking(rule, slot));
+    }
+
+    private boolean isBlockedByAnyAppointment(
+            TimeSlot slot,
             List<Appointment> appointments) {
 
-        if (slot.isInPast()) {
-            return AvailabilityStatus.PAST;
+        if (appointments == null || appointments.isEmpty()) {
+            return false;
         }
 
-        // Vérifier indisponibilités
-        if (unavailabilities.stream().anyMatch(rule -> rule.blocksTimeSlot(slot))) {
-            return AvailabilityStatus.UNAVAILABLE;
-        }
-
-        // Vérifier rendez-vous existants
-        if (appointments.stream().anyMatch(apt -> isAppointmentBlocking(apt, slot))) {
-            return AvailabilityStatus.BOOKED;
-        }
-
-        return AvailabilityStatus.AVAILABLE;
-    }
-
-    private boolean isAppointmentBlocking(Appointment appointment, TimeSlot slot) {
-        return (appointment.getStatus() == AppointmentStatus.PENDING ||
-                appointment.getStatus() == AppointmentStatus.CONFIRMED) &&
-                appointment.getSlot().overlaps(slot);
+        return appointments.stream()
+                .anyMatch(apt -> isAppointmentBlocking(apt, slot));
     }
 }
-
-
-//
-///**
-// * Domain Service - Générateur de créneaux disponibles
-// *
-// * Responsabilités :
-// * 1. Vérifier que le contractor est actif
-// * 2. Générer les créneaux depuis les AvailabilityRule (avec BreakTime)
-// * 3. Filtrer les UnavailabilityRule (congés, absences)
-// * 4. Filtrer les Appointments existants
-// * 5. Filtrer les créneaux dans le passé
-// */
-//public class SlotGeneratorService {
-//
-//    private final AvailabilityRuleRepositoryPort availabilityRuleRepositoryPort;
-//    private final UnavailabilityRuleRepositoryPort unavailabilityRuleRepositoryPort;
-//    private final AppointmentRepositoryPort appointmentRepositoryPort;
-//    private final ContractorRepositoryPort contractorRepositoryPort;
-//
-//    public SlotGeneratorService(AvailabilityRuleRepositoryPort availabilityRuleRepositoryPort, UnavailabilityRuleRepositoryPort unavailabilityRuleRepositoryPort, AppointmentRepositoryPort appointmentRepositoryPort, ContractorRepositoryPort contractorRepositoryPort) {
-//        this.availabilityRuleRepositoryPort = availabilityRuleRepositoryPort;
-//        this.unavailabilityRuleRepositoryPort = unavailabilityRuleRepositoryPort;
-//        this.appointmentRepositoryPort = appointmentRepositoryPort;
-//        this.contractorRepositoryPort = contractorRepositoryPort;
-//    }
-//
-//
-//    /**
-//     * Génère tous les créneaux disponibles pour un prestataire sur une période
-//     *
-//     * @param contractorId ID du prestataire
-//     * @param startDate Date de début
-//     * @param endDate Date de fin
-//     * @return Liste des créneaux disponibles
-//     */
-//    public List<AvailableSlot> generateAvailableSlots(
-//            UUID contractorId,
-//            LocalDate startDate,
-//            LocalDate endDate) {
-//
-//        // 1. Vérifier que le contractor est actif
-//        if (!isContractorActive(contractorId)) {
-//            return Collections.emptyList();
-//        }
-//
-//        // 2. Récupérer toutes les règles actives du prestataire
-//        List<AvailabilityRule> activeRules = availabilityRuleRepositoryPort
-//                .findActiveByContractorId(contractorId);
-//
-//        if (activeRules.isEmpty()) {
-//            return Collections.emptyList();
-//        }
-//
-//        // 3. Générer les créneaux bruts pour chaque jour
-//        List<TimeSlot> rawSlots = generateRawSlots(activeRules, startDate, endDate);
-//
-//        // 4. Récupérer les indisponibilités sur la période
-//        List<UnavailabilityRule> unavailabilities = unavailabilityRuleRepositoryPort
-//                .findByContractorIdAndPeriod(contractorId, startDate, endDate);
-//
-//        // 5. Récupérer les rendez-vous existants sur la période
-//        List<Appointment> existingAppointments = appointmentRepositoryPort
-//                .findActiveByContractorIdAndPeriod(contractorId,
-//                        startDate.atStartOfDay(),
-//                        endDate.plusDays(1).atStartOfDay());
-//
-//        // 6. Filtrer et marquer les créneaux
-//        return markSlotsAvailability(
-//                contractorId,
-//                rawSlots,
-//                unavailabilities,
-//                existingAppointments
-//        );
-//    }
-//
-//    /**
-//     * Génère les créneaux bruts depuis les règles de disponibilité
-//     */
-//    private List<TimeSlot> generateRawSlots(
-//            List<AvailabilityRule> rules,
-//            LocalDate startDate,
-//            LocalDate endDate) {
-//
-//        List<TimeSlot> allSlots = new ArrayList<>();
-//
-//        // Pour chaque jour de la période
-//        LocalDate currentDate = startDate;
-//        while (!currentDate.isAfter(endDate)) {
-//            for (AvailabilityRule rule : rules) {
-//                // Utilise ta méthode generateSlotsForDay !
-//                List<TimeSlot> dailySlots = rule.generateSlotsForDay(currentDate);
-//                allSlots.addAll(dailySlots);
-//            }
-//            currentDate = currentDate.plusDays(1);
-//        }
-//
-//        // Trier les créneaux par ordre chronologique
-//        allSlots.sort(Comparator.comparing(TimeSlot::startDateTime));
-//
-//        return allSlots;
-//    }
-//
-//    /**
-//     * Marque la disponibilité de chaque créneau
-//     */
-//    private List<AvailableSlot> markSlotsAvailability(
-//            UUID contractorId,
-//            List<TimeSlot> rawSlots,
-//            List<UnavailabilityRule> unavailabilities,
-//            List<Appointment> appointments) {
-//
-//        List<AvailableSlot> markedSlots = new ArrayList<>();
-//
-//        for (TimeSlot slot : rawSlots) {
-//            AvailabilityStatus status = determineSlotStatus(
-//                    slot,
-//                    unavailabilities,
-//                    appointments
-//            );
-//
-//            markedSlots.add(new AvailableSlot(
-//                    contractorId,
-//                    slot,
-//                    status
-//            ));
-//        }
-//
-//        return markedSlots;
-//    }
-//
-//    /**
-//     * Détermine le statut d'un créneau
-//     */
-//    private AvailabilityStatus determineSlotStatus(
-//            TimeSlot slot,
-//            List<UnavailabilityRule> unavailabilities,
-//            List<Appointment> appointments) {
-//
-//        // 1. Vérifier si le créneau est dans le passé
-//        if (slot.isInPast()) {
-//            return AvailabilityStatus.PAST;
-//        }
-//
-//        // 2. Vérifier les indisponibilités
-//        for (UnavailabilityRule unavailability : unavailabilities) {
-//            if (unavailability.blocksTimeSlot(slot)) {
-//                return AvailabilityStatus.UNAVAILABLE;
-//            }
-//        }
-//
-//        // 3. Vérifier les rendez-vous existants
-//        for (Appointment appointment : appointments) {
-//            if (isAppointmentBlockingSlot(appointment, slot)) {
-//                return AvailabilityStatus.BOOKED;
-//            }
-//        }
-//
-//        // 4. Le créneau est disponible !
-//        return AvailabilityStatus.AVAILABLE;
-//    }
-//
-//    /**
-//     * Vérifie si un rendez-vous bloque un créneau
-//     */
-//    private boolean isAppointmentBlockingSlot(Appointment appointment, TimeSlot slot) {
-//        // Un RDV bloque s'il est actif (PENDING ou CONFIRMED) et qu'il chevauche
-//        if (appointment.getStatus() == AppointmentStatus.CANCELLED ||
-//                appointment.getStatus() == AppointmentStatus.COMPLETED) {
-//            return false;
-//        }
-//
-//        return appointment.getSlot().overlaps(slot);
-//    }
-//
-//    /**
-//     * Vérifie si le contractor est actif
-//     */
-//    private boolean isContractorActive(UUID contractorId) {
-//        return contractorRepositoryPort.isActive(contractorId);
-//    }
-//
-//    /**
-//     * Trouve les créneaux disponibles uniquement
-//     */
-//    public List<TimeSlot> findOnlyAvailableSlots(
-//            UUID contractorId,
-//            LocalDate startDate,
-//            LocalDate endDate) {
-//
-//        return generateAvailableSlots(contractorId, startDate, endDate)
-//                .stream()
-//                .filter(slot -> slot.status() == AvailabilityStatus.AVAILABLE)
-//                .map(AvailableSlot::timeSlot)
-//                .collect(Collectors.toList());
-//    }
-//
-//    /**
-//     * Vérifie si un créneau spécifique est disponible
-//     */
-//    public boolean isSlotAvailable(
-//            UUID contractorId,
-//            LocalDateTime startDateTime,
-//            int duration) {
-//
-//        TimeSlot requestedSlot = new TimeSlot(startDateTime, duration);
-//
-//        // Générer les créneaux du jour
-//        List<AvailableSlot> daySlots = generateAvailableSlots(
-//                contractorId,
-//                startDateTime.toLocalDate(),
-//                startDateTime.toLocalDate()
-//        );
-//
-//        // Vérifier si le créneau demandé existe et est disponible
-//        return daySlots.stream()
-//                .anyMatch(slot ->
-//                        slot.timeSlot().equals(requestedSlot) &&
-//                                slot.status() == AvailabilityStatus.AVAILABLE
-//                );
-//    }
-//}
-//

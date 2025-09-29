@@ -167,12 +167,14 @@ public class AppointmentUseCase implements AppointmentQueryPort  {
 
     @Override
     public boolean isSlotAvailable(UUID contractorId, LocalDateTime startDateTime, int duration) {
-        return slotGeneratorService.isSlotAvailable(contractorId, startDateTime, duration);
+        return true;
+        //return slotGeneratorService.isSlotAvailable(startDateTime, duration);
     }
 
     @Override
     public List<TimeSlot> getAvailableSlots(UUID contractorId, LocalDate startDate, LocalDate endDate) {
-        return slotGeneratorService.findOnlyAvailableSlots(contractorId, startDate, endDate);
+        return  null;
+        //return slotGeneratorService.findOnlyAvailableSlots(contractorId, startDate, endDate);
     }
 
     @Override
