@@ -47,7 +47,7 @@ export class AppSidebar implements OnInit {
             items: [
                 { label: 'Services', icon: 'pi pi-fw pi-briefcase', routerLink: ['service'] },
                 { label: 'Clients', icon: 'pi pi-fw pi-user', routerLink: ['client'] },
-                { label: 'Prestataires', icon: 'pi pi-fw pi-hammer', routerLink: ['prestataire'] },
+                { label: 'Prestataires', icon: 'pi pi-fw pi-hammer', routerLink: ['contractor'] },
             ]
         },
     ];

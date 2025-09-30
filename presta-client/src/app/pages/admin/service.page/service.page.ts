@@ -33,7 +33,7 @@ interface ExportColumn {
 }
 
 @Component({
-    selector: 'app-service.page',
+    selector: 'app-admin-service.page',
     imports: [
         CommonModule,
         TableModule,

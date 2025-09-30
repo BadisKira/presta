@@ -5,6 +5,7 @@ import { ToastModule } from "primeng/toast";
 import { ignoreElements } from 'rxjs';
 import { UserManagementService } from './services/userManagement/user-management.service';
 import { Contractor } from './models/contractor.model';
+import { LayoutService } from './layout/layout.service';
 @Component({
   selector: 'app-root',
   imports: [RouterOutlet, ToastModule],
@@ -19,11 +20,18 @@ export class App implements OnInit {
   private keycloakService = inject(KeycloakService);
   private userManegementService = inject(UserManagementService);
   private router = inject(Router);
+  private layoutService = inject(LayoutService);
 
+
+  initTheme(){
+    const darkmode = localStorage.getItem("darkmode") === 'true' ? true : false ; 
+    this.layoutService.layoutConfig.update((state) => ({ ...state, darkTheme: darkmode }));
+  }
 
 
   ngOnInit(): void { 
-    if( this.keycloakService.getRoles().includes("CONTRACTOR")){
+    this.initTheme();
+    if( this.keycloakService.isLoggedIn() && this.keycloakService.getRoles().includes("CONTRACTOR")){
         this.userManegementService.getCurrentUser().subscribe(
         (user) =>{
             const contractor = user as Contractor;

@@ -10,10 +10,13 @@ import { Client } from '../../../../models/client.model';
 import { Contractor } from '../../../../models/contractor.model';
 import { KeycloakProfile } from 'keycloak-js';
 import { ProfileDropdownComponent } from "../../../../layout/components/profile-dropdown/profile-dropdown";
+import { DarkmodeButtonComponent } from "../../../../layout/components/darkmode-button.component/darkmode-button.component";
 
 @Component({
   selector: 'topbar-component',
-  imports: [RouterModule, StyleClassModule, ButtonModule, RippleModule, CommonModule, ProfileDropdownComponent],
+  imports: [RouterModule, StyleClassModule, ButtonModule, 
+    RippleModule, CommonModule, ProfileDropdownComponent,
+    DarkmodeButtonComponent],
   templateUrl: './topbar.html',
   styleUrl: './topbar.scss'
 })

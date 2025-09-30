@@ -4,7 +4,7 @@ import { UserProfile } from '../../models/user.model';
 import { HttpClient } from '@angular/common/http';
 import { MessageService } from 'primeng/api';
 import { Router } from '@angular/router';
-import { Observable } from 'rxjs';
+import { catchError, Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -38,16 +38,20 @@ export class KeycloakService {
 
   async init() {
     this.keycloak.onAuthSuccess = async () => {
+
+      console.log("Suis je ici ? ");
+      console.log(this.getRoles());
       if (this.getRoles().includes('ADMIN')) {
-        localStorage.setItem('role', 'ADMIN');
-        localStorage.setItem('userSynced', 'true');
+        //localStorage.setItem('role', 'ADMIN');
+        //localStorage.setItem('userSynced', 'true');
         return;
       }
       if (!localStorage.getItem('userSynced')
         && !this.getRoles().includes('CONTRACTOR')
         && !this.getRoles().includes('CLIENT')) {
         this.syncUserWithBackend();
-        localStorage.setItem('userSynced', 'true');
+        //localStorage.setItem('userSynced', 'true');
+        return;
       }
     };
 
@@ -106,6 +110,7 @@ export class KeycloakService {
 
 
   async syncUserWithBackend(): Promise<boolean> {
+    console.log(this.keycloak.token)
     if (!this.keycloak.token || localStorage.getItem("userSynced")) {
       return false;
     }
@@ -117,26 +122,24 @@ export class KeycloakService {
       tentative++;
 
       try {
-        const response = await this.http.get(this._urlSyncUser + `?role=${localStorage.getItem("role")}`, {
+        await this.http.get(this._urlSyncUser + `?role=${localStorage.getItem("role")}`, {
           responseType: 'text'
         }).toPromise();
+
         localStorage.removeItem('role');
-        // this.messageService.add({
-        //   severity: 'success',
-        //   summary: 'Synchronisation réussie',
-        //   detail: response
-        // });
         return true;
 
-      } catch (error: any) {
+      } catch (error) {
         if (tentative === maxTentatives) {
           this.handleSyncError(error);
           return false;
         }
+
         const delai = tentative * 1000;
         await this.wait(delai);
       }
     }
+
 
     return false;
   }

@@ -26,11 +26,13 @@ interface MenuChangeEvent {
     providedIn: 'root'
 })
 export class LayoutService {
+
+    private darkMode = localStorage.getItem("darkmode");
     _config: layoutConfig = {
         preset: 'Aura',
         primary: 'emerald',
         surface: null,
-        darkTheme: false,
+        darkTheme: this.darkMode === 'true' ? true : false,
         menuMode: 'static'
     };
 
@@ -116,11 +118,12 @@ export class LayoutService {
             .then(() => {
                 this.onTransitionEnd();
             })
-            .catch(() => {});
+            .catch(() => { });
     }
 
     toggleDarkMode(config?: layoutConfig): void {
         const _config = config || this.layoutConfig();
+        localStorage.setItem("darkmode",String(_config.darkTheme));
         if (_config.darkTheme) {
             document.documentElement.classList.add('app-dark');
         } else {

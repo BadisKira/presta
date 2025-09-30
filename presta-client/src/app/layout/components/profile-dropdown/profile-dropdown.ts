@@ -152,9 +152,21 @@ export class ProfileDropdownComponent implements OnInit {
           label: 'Administration',
           icon: 'pi pi-cog',
           items: [
-            { label: 'Utilisateurs', icon: 'pi pi-users' },
-            { label: 'Configuration', icon: 'pi pi-wrench' },
-            { label: 'Logs', icon: 'pi pi-file-edit' }
+            { 
+              label: 'Clients', 
+              icon: 'pi pi-users',
+              command: () => this.router.navigate(['/admin/client'])
+            },
+            { 
+              label: 'Services', 
+              icon: 'pi pi-wrench',
+              command: () => this.router.navigate(['/admin/service'])
+            },
+            { 
+              label: 'Préstataires', 
+              icon: 'pi pi-file-edit',
+              command: () => this.router.navigate(['/admin/contractor'])
+            }
           ]
         },
         { separator: true }
@@ -163,11 +175,13 @@ export class ProfileDropdownComponent implements OnInit {
       baseItems.push(
         {
           label: 'Mes Missions',
-          icon: 'pi pi-briefcase'
+          icon: 'pi pi-briefcase',
+          command: () => this.router.navigate(['/contractor/missions'])
         },
         {
           label: 'Planning',
-          icon: 'pi pi-calendar'
+          icon: 'pi pi-calendar',
+          command: () => this.router.navigate(['/contractor/planning'])
         },
         { separator: true }
       );
@@ -175,11 +189,13 @@ export class ProfileDropdownComponent implements OnInit {
       baseItems.push(
         {
           label: 'Mes Demandes',
-          icon: 'pi pi-list'
+          icon: 'pi pi-list',
+          command: () => this.router.navigate(['/client/requests'])
         },
         {
           label: 'Historique',
-          icon: 'pi pi-history'
+          icon: 'pi pi-history',
+          command: () => this.router.navigate(['/client/history'])
         },
         { separator: true }
       );
@@ -187,15 +203,6 @@ export class ProfileDropdownComponent implements OnInit {
 
     // Actions communes
     baseItems.push(
-      {
-        label: 'Paramètres',
-        icon: 'pi pi-cog'
-      },
-      {
-        label: 'Aide',
-        icon: 'pi pi-question-circle'
-      },
-      { separator: true },
       {
         label: 'Déconnexion',
         icon: 'pi pi-sign-out',
@@ -206,7 +213,6 @@ export class ProfileDropdownComponent implements OnInit {
 
     return baseItems;
   });
-
  async ngOnInit() {
     try {
       await this.loadCurrentProfile();
@@ -244,13 +250,13 @@ export class ProfileDropdownComponent implements OnInit {
 
     switch (type) {
       case 'ADMIN':
-        // Navigation vers profile admin
+        this.router.navigate(['/admin/'])
         break;
       case 'CONTRACTOR':
-        // Navigation vers profile contractor
+        this.router.navigate(['/contractor/profile'])
         break;
       case 'CLIENT':
-        // Navigation vers profile client
+        this.router.navigate(['/client/profile'])
         break;
     }
   }

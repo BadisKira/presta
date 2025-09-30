@@ -24,6 +24,10 @@ export const routes: Routes = [
             {
                 path: 'client',
                 loadComponent: () => import('./pages/admin/client.page/client.page').then(m => m.ClientPage)
+            },
+             {
+                path: 'contractor',
+                loadComponent: () => import('./pages/admin/contractor.page/contractor.page').then(m => m.ContractorPage)
             }
         ]
     },
@@ -35,7 +39,11 @@ export const routes: Routes = [
             {
                 path: 'complete-profile',
                 loadComponent: () => import('./pages/contractor/contractor-fill-information/contractor-fill-information').then(m => m.ContractorFillInformation)
-            }
+            } , //ProfilePage
+            {
+                path: 'profile',
+                loadComponent: () => import('./pages/contractor/profile.page/profile.page').then(m => m.ProfilePage)
+            } 
         ]
     },
     {

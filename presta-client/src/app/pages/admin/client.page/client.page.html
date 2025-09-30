@@ -1,12 +1,5 @@
 <!-- client.page.html -->
 <p-toolbar styleClass="mb-6">
-    <ng-template pTemplate="start">
-        <!-- <p-button label="Nouveau" icon="pi pi-plus" severity="secondary" class="mr-2" (onClick)="openNew()" /> -->
-        <!-- <p-button severity="secondary" label="Supprimer" icon="pi pi-trash" outlined 
-                  (onClick)="openDeleteSelectedClientsDialogConfirmation(selectedClients)" 
-                  [disabled]="!selectedClients || !selectedClients.length" /> -->
-    </ng-template>
-
     <ng-template pTemplate="end">
         <p-button label="Actualiser" icon="pi pi-refresh" severity="secondary" class="mr-2" (onClick)="refreshData()" />
         <p-button label="Exporter" icon="pi pi-upload" severity="secondary" (onClick)="exportCSV()" />
