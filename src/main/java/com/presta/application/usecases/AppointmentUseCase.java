@@ -11,7 +11,6 @@ import com.presta.domain.port.in.appointment.AppointmentQueryPort;
 import com.presta.domain.port.out.ClientRepositoryPort;
 import com.presta.domain.port.out.ContractorRepositoryPort;
 import com.presta.domain.port.out.*;
-import com.presta.domain.service.SlotGeneratorService;
 import com.presta.domain.model.valueobject.TimeSlot;
 
 import org.springframework.stereotype.Component;
@@ -29,14 +28,12 @@ public class AppointmentUseCase implements AppointmentQueryPort  {
     private final AppointmentRepositoryPort appointmentRepositoryPort;
     private final ContractorRepositoryPort contractorRepositoryPort;
     private final ClientRepositoryPort clientRepositoryPort;
-    private final SlotGeneratorService slotGeneratorService;
     private final UserRepositoryPort userRepositoryPort;
 
-    public AppointmentUseCase(AppointmentRepositoryPort appointmentRepositoryPort, ContractorRepositoryPort contractorRepositoryPort, ClientRepositoryPort clientRepositoryPort, SlotGeneratorService slotGeneratorService, UserRepositoryPort userRepositoryPort) {
+    public AppointmentUseCase(AppointmentRepositoryPort appointmentRepositoryPort, ContractorRepositoryPort contractorRepositoryPort, ClientRepositoryPort clientRepositoryPort,  UserRepositoryPort userRepositoryPort) {
         this.appointmentRepositoryPort = appointmentRepositoryPort;
         this.contractorRepositoryPort = contractorRepositoryPort;
         this.clientRepositoryPort = clientRepositoryPort;
-        this.slotGeneratorService = slotGeneratorService;
         this.userRepositoryPort = userRepositoryPort;
     }
 

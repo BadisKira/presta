@@ -17,6 +17,7 @@ public class UnavailabilityRule {
 
     // Factory method pour création
     public static UnavailabilityRule create(
+            UUID id,
             UUID contractorId,
             LocalDate startDate,
             LocalDate endDate,
@@ -25,7 +26,7 @@ public class UnavailabilityRule {
             String reason) {
 
         return new UnavailabilityRule(
-                UUID.randomUUID(),
+                id,
                 contractorId,
                 new UnavailabilityPeriod(startDate, endDate, startTime, endTime),
                 reason,
@@ -35,21 +36,23 @@ public class UnavailabilityRule {
 
     // Factory method pour indisponibilité journée complète
     public static UnavailabilityRule createFullDay(
+            UUID id,
             UUID contractorId,
             LocalDate startDate,
             LocalDate endDate,
             String reason) {
 
-        return create(contractorId, startDate, endDate, null, null, reason);
+        return create(id,contractorId, startDate, endDate, null, null, reason);
     }
 
     // Factory method pour indisponibilité d'une seule journée
     public static UnavailabilityRule createSingleDay(
+            UUID id,
             UUID contractorId,
             LocalDate date,
             String reason) {
 
-        return createFullDay(contractorId, date, date, reason);
+        return createFullDay(id,contractorId, date, date, reason);
     }
 
     // Constructor complet pour reconstitution
@@ -60,7 +63,7 @@ public class UnavailabilityRule {
             String reason,
             LocalDateTime createdAt) {
 
-        if (id == null || contractorId == null || period == null) {
+        if (contractorId == null || period == null) {
             throw new IllegalArgumentException("Les champs obligatoires ne peuvent être null");
         }
 
@@ -87,38 +90,24 @@ public class UnavailabilityRule {
         return period.overlapsWithSlot(slot.startDateTime(), slot.getEndDateTime());
     }
 
-    /**
-     * Vérifie si cette règle bloque un moment précis
-     */
     public boolean blocksDateTime(LocalDateTime dateTime) {
         return period.contains(dateTime);
     }
 
-    /**
-     * Vérifie si cette règle est dans le futur
-     */
     public boolean isFuture() {
         return period.startDate().isAfter(LocalDate.now());
     }
 
-    /**
-     * Vérifie si cette règle est passée
-     */
     public boolean isPast() {
         return period.endDate().isBefore(LocalDate.now());
     }
 
-    /**
-     * Vérifie si cette règle est actuellement active
-     */
     public boolean isCurrentlyActive() {
         LocalDate today = LocalDate.now();
         return !today.isBefore(period.startDate()) && !today.isAfter(period.endDate());
     }
 
-    /**
-     * Prolonge la période d'indisponibilité
-     */
+
     public UnavailabilityRule extendPeriod(LocalDate newEndDate) {
         if (newEndDate.isBefore(period.endDate())) {
             throw new IllegalArgumentException(

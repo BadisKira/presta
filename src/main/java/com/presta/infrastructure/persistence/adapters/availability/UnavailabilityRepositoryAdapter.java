@@ -2,6 +2,10 @@ package com.presta.infrastructure.persistence.adapters.availability;
 
 import com.presta.domain.model.UnavailabilityRule;
 import com.presta.domain.port.out.UnavailabilityRuleRepositoryPort;
+import com.presta.infrastructure.persistence.entities.UnavailabilityRuleEntity;
+import com.presta.infrastructure.persistence.mapper.availability.UnavailabilityRuleMapper;
+import com.presta.infrastructure.persistence.repositories.JpaUnavailabilityRuleRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,14 +18,27 @@ import java.util.UUID;
 @Repository
 @Transactional
 public class UnavailabilityRepositoryAdapter implements UnavailabilityRuleRepositoryPort {
+
+    private final JpaUnavailabilityRuleRepository jpaUnavailabilityRuleRepository ;
+    private final UnavailabilityRuleMapper unavailabilityRuleMapper;
+
+    public UnavailabilityRepositoryAdapter(JpaUnavailabilityRuleRepository jpaUnavailabilityRuleRepository, UnavailabilityRuleMapper unavailabilityRuleMapper) {
+        this.jpaUnavailabilityRuleRepository = jpaUnavailabilityRuleRepository;
+        this.unavailabilityRuleMapper = unavailabilityRuleMapper;
+    }
+
     @Override
-    public List<UnavailabilityRule> findByContractorIdAndPeriod(UUID id, LocalDate startDate, LocalDate endDate) {
-        return List.of();
+    public List<UnavailabilityRule> findByContractorIdAndDateRange(UUID id, LocalDate startDate, LocalDate endDate) {
+        return  this.jpaUnavailabilityRuleRepository.findByContractorIdAndDateRange(id,startDate,endDate).stream()
+                .map(this.unavailabilityRuleMapper::toDomain)
+                .toList();
     }
 
     @Override
     public UnavailabilityRule save(UnavailabilityRule rule) {
-        return null;
+        UnavailabilityRuleEntity unavailabilityRuleEntity = this.unavailabilityRuleMapper.toEntity(rule);
+        UnavailabilityRuleEntity entity = this.jpaUnavailabilityRuleRepository.save(unavailabilityRuleEntity);
+        return this.unavailabilityRuleMapper.toDomain(entity);
     }
 
     @Override

@@ -124,6 +124,7 @@ class AppointmentDomainServiceTest {
         // Indisponibilité: journée complète le 20 janvier
         UnavailabilityRule unavailability = UnavailabilityRule.createFullDay(
                 UUID.randomUUID(),
+                UUID.randomUUID(),
                 LocalDate.of(2025, 1, 20),
                 LocalDate.of(2025, 1, 20),
                 "Congés"

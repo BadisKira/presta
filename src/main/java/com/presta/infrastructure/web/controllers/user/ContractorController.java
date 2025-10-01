@@ -3,6 +3,8 @@ package com.presta.infrastructure.web.controllers.user;
 import com.presta.domain.exception.UserNotFoundException;
 import com.presta.domain.model.Contractor;
 import com.presta.domain.model.User;
+import com.presta.domain.newshit.ContractorPlanning;
+import com.presta.domain.newshit.SchedulingUseCase;
 import com.presta.domain.port.out.ContractorRepositoryPort;
 import com.presta.domain.port.out.UserAuthenticationPort;
 import com.presta.domain.port.out.UserRepositoryPort;
@@ -16,6 +18,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -27,11 +30,13 @@ public class ContractorController {
     private final ContractorRepositoryPort contractorRepositoryPort;
     private final UserAuthenticationPort authPort;
     private final UserRepositoryPort userRepositoryPort;
+    private final SchedulingUseCase schedulingUseCase;
 
-    public ContractorController(ContractorRepositoryPort contractorRepositoryPort, UserAuthenticationPort authPort, UserRepositoryPort userRepositoryPort) {
+    public ContractorController(ContractorRepositoryPort contractorRepositoryPort, UserAuthenticationPort authPort, UserRepositoryPort userRepositoryPort, SchedulingUseCase schedulingUseCase) {
         this.contractorRepositoryPort = contractorRepositoryPort;
         this.authPort = authPort;
         this.userRepositoryPort = userRepositoryPort;
+        this.schedulingUseCase = schedulingUseCase;
     }
 
     @GetMapping
@@ -90,7 +95,13 @@ public class ContractorController {
         return ResponseEntity.ok(ContractorDto.fromDomain(contractor));
     }
 
-
-
-
+    @GetMapping("/{id}/plannings")
+    public ResponseEntity<ContractorPlanning> contractorPlanningResponse(
+            @PathVariable UUID id ,
+            @RequestParam LocalDate startDate,
+            @RequestParam LocalDate endDate
+            ){
+        ContractorPlanning contractorPlanning = this.schedulingUseCase.generatePlanning(id,startDate,endDate);
+        return ResponseEntity.ok(contractorPlanning);
+    }
 }

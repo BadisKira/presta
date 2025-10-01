@@ -48,17 +48,20 @@
                     </a>
                 </li>
             </ul>
-            
+
 
             <div class="flex border-t lg:border-t-0 border-surface py-4 lg:py-0 mt-4 lg:mt-0 gap-2">
                 @if (isLoggedIn) {
-                <div>
+                <div class="flex justify-center items-center gap-2">
                     <!-- <p> Sono na wa Eren yeaaager</p>
                 <a [routerLink]="'/admin'">to admin</a>
                 <button pButton pRipple label="Se déconnecter" (click)="logout()" [rounded]="true"
                     [text]="true"></button> -->
 
                     <app-profile-dropdown />
+                  <div class="pt-2 ml-auto">
+                    <darkmode-button-component />
+                  </div>
                 </div>
                 } @else {
 
@@ -68,13 +71,14 @@
                 <button pButton pRipple label="Devenir un prestataire" (click)="register('CONTRACTOR')"
                     [rounded]="true">
                 </button>
-                
-                <div class="pt-2 ml-auto">
-                    <darkmode-button-component />
-                </div>
+
+              <div class="pt-2 ml-auto">
+                <darkmode-button-component />
+              </div>
                 <!-- <app-floating-configurator [float]="false"/> -->
                 }
             </div>
+
         </div>
     </div>
 </div>

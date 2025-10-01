@@ -8,7 +8,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface UnavailabilityRuleRepositoryPort {
-    List<UnavailabilityRule> findByContractorIdAndPeriod(UUID id , LocalDate startDate, LocalDate endDate);
+    List<UnavailabilityRule> findByContractorIdAndDateRange(UUID id , LocalDate startDate, LocalDate endDate);
     UnavailabilityRule save(UnavailabilityRule rule);
     Optional<UnavailabilityRule> findById(UUID id);
     void deleteById(UUID id);
