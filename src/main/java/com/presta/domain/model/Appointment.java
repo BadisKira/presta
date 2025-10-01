@@ -20,6 +20,7 @@ public class Appointment {
 
     // Factory method pour création
     public static Appointment create(
+            UUID id,
             UUID clientId,
             UUID contractorId,
             LocalDateTime startDateTime,
@@ -27,7 +28,7 @@ public class Appointment {
             String reason) {
 
         return new Appointment(
-                UUID.randomUUID(),
+                id,
                 clientId,
                 contractorId,
                 new TimeSlot(startDateTime, duration),

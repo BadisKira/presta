@@ -2,9 +2,9 @@ package com.presta.infrastructure.persistence.adapters;
 
 import com.presta.domain.model.Appointment;
 import com.presta.domain.model.valueobject.AppointmentStatus;
-import com.presta.domain.port.out.AppointmentRepositoryPort;
+import com.presta.domain.port.AppointmentRepositoryPort;
 import com.presta.infrastructure.persistence.entities.AppointmentEntity;
-import com.presta.infrastructure.persistence.mapper.appointment.AppointmentMapper;
+import com.presta.infrastructure.persistence.mapper.AppointmentMapper;
 import com.presta.infrastructure.persistence.repositories.JpaAppointmentRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Repository;
@@ -36,11 +36,9 @@ public class AppointmentRepositoryAdapter implements AppointmentRepositoryPort {
 
         AppointmentEntity entity;
         if (existingEntity.isPresent()) {
-            // Mise à jour de l'entité existante
             entity = existingEntity.get();
             mapper.updateEntity(entity, appointment);
         } else {
-            // Nouvelle entité
             entity = mapper.toEntity(appointment);
         }
 

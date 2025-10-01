@@ -2,7 +2,7 @@ package com.presta.infrastructure.web.controllers;
 
 
 import com.presta.domain.model.UnavailabilityRule;
-import com.presta.infrastructure.persistence.adapters.availability.UnavailabilityRepositoryAdapter;
+import com.presta.infrastructure.persistence.adapters.UnavailabilityRepositoryAdapter;
 import com.presta.infrastructure.web.dtos.availability.CreateUnavailabilityRuleRequest;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;

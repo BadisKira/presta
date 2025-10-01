@@ -1,21 +1,20 @@
 package com.presta.application.config;
 
 
-import com.presta.domain.newshit.ContractorScheduleService;
-import com.presta.domain.newshit.SchedulingUseCase;
-import com.presta.domain.port.in.UserProfilePort;
-import com.presta.domain.port.in.UserSyncPort;
-import com.presta.domain.port.out.*;
+import com.presta.domain.service.ContractorScheduleService;
+import com.presta.application.usecases.SchedulingUseCase;
+import com.presta.domain.port.UserProfilePort;
+import com.presta.domain.port.UserRepositoryPort;
+import com.presta.domain.port.UserSyncPort;
 import com.presta.domain.service.UserProfileDomainService;
 import com.presta.domain.service.UserSyncDomainService;
 import com.presta.infrastructure.persistence.adapters.UserRepositoryAdapter;
-import com.presta.infrastructure.persistence.adapters.availability.UnavailabilityRepositoryAdapter;
-import com.presta.infrastructure.persistence.mapper.availability.AvailabilityRuleMapper;
-import com.presta.infrastructure.persistence.mapper.availability.UnavailabilityRuleMapper;
+import com.presta.infrastructure.persistence.adapters.UnavailabilityRepositoryAdapter;
+import com.presta.infrastructure.persistence.mapper.AvailabilityRuleMapper;
+import com.presta.infrastructure.persistence.mapper.UnavailabilityRuleMapper;
 import com.presta.infrastructure.persistence.repositories.JpaAppointmentRepository;
-import com.presta.infrastructure.persistence.repositories.JpaUnavailabilityRuleRepository;
-import com.presta.infrastructure.persistence.repositories.availability.JpaAvailabilityRuleRepository;
-import com.presta.infrastructure.persistence.repositories.user.JpaContractorRepository;
+import com.presta.infrastructure.persistence.repositories.JpaAvailabilityRuleRepository;
+import com.presta.infrastructure.persistence.repositories.JpaContractorRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 

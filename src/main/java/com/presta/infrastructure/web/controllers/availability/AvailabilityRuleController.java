@@ -1,7 +1,7 @@
 package com.presta.infrastructure.web.controllers.availability;
 
 import com.presta.domain.model.AvailabilityRule;
-import com.presta.infrastructure.persistence.adapters.availability.AvailabilityRepositoryAdapter;
+import com.presta.infrastructure.persistence.adapters.AvailabilityRepositoryAdapter;
 import com.presta.infrastructure.web.dtos.availability.CreateAvailabilityRuleRequest;
 import com.presta.infrastructure.web.dtos.availability.CreateBeakTimeRequest;
 import org.springframework.http.HttpStatusCode;

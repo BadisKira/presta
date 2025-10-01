@@ -2,9 +2,9 @@ package com.presta.application.usecases;
 
 import com.presta.domain.model.Assignment;
 import com.presta.domain.model.Contractor;
-import com.presta.domain.port.out.ContractorRepositoryPort;
-import com.presta.domain.port.out.AssignmentPort;
-import com.presta.domain.port.out.UserRepositoryPort;
+import com.presta.domain.port.ContractorRepositoryPort;
+import com.presta.domain.port.AssignmentPort;
+import com.presta.domain.port.UserRepositoryPort;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;

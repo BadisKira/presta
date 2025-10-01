@@ -2,13 +2,11 @@ package com.presta.infrastructure.web.controllers.user;
 
 import com.presta.domain.exception.UserNotFoundException;
 import com.presta.domain.model.Contractor;
-import com.presta.domain.model.User;
-import com.presta.domain.newshit.ContractorPlanning;
-import com.presta.domain.newshit.SchedulingUseCase;
-import com.presta.domain.port.out.ContractorRepositoryPort;
-import com.presta.domain.port.out.UserAuthenticationPort;
-import com.presta.domain.port.out.UserRepositoryPort;
-import com.presta.infrastructure.persistence.entities.UserEntity;
+import com.presta.domain.model.ContractorPlanning;
+import com.presta.application.usecases.SchedulingUseCase;
+import com.presta.domain.port.ContractorRepositoryPort;
+import com.presta.domain.port.UserAuthenticationPort;
+import com.presta.domain.port.UserRepositoryPort;
 import com.presta.infrastructure.web.dtos.contractor.ContractorDto;
 import com.presta.infrastructure.web.dtos.contractor.UpdateContractorRequest;
 import jakarta.validation.Valid;
@@ -19,8 +17,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
-import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
 
 @RestController

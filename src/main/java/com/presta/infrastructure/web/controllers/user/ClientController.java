@@ -2,10 +2,9 @@ package com.presta.infrastructure.web.controllers.user;
 
 import com.presta.domain.exception.UserNotFoundException;
 import com.presta.domain.model.Client;
-import com.presta.domain.port.out.ClientRepositoryPort;
-import com.presta.domain.port.out.UserAuthenticationPort;
-import com.presta.domain.port.out.UserRepositoryPort;
-import com.presta.infrastructure.web.dtos.contractor.ContractorDto;
+import com.presta.domain.port.ClientRepositoryPort;
+import com.presta.domain.port.UserAuthenticationPort;
+import com.presta.domain.port.UserRepositoryPort;
 import com.presta.infrastructure.web.dtos.user.ClientDto;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;

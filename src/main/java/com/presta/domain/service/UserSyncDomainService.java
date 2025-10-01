@@ -6,11 +6,9 @@ import com.presta.domain.model.User;
 import com.presta.domain.model.valueobject.ContactInfo;
 import com.presta.domain.model.valueobject.KeycloakUserId;
 import com.presta.domain.model.valueobject.UserProfile;
-import com.presta.domain.port.in.UserSyncPort;
-import com.presta.domain.port.out.UserRepositoryPort;
-import org.springframework.transaction.annotation.Transactional;
+import com.presta.domain.port.UserSyncPort;
+import com.presta.domain.port.UserRepositoryPort;
 
-import java.util.List;
 import java.util.Optional;
 
 public class UserSyncDomainService implements UserSyncPort {

@@ -2,7 +2,7 @@ package com.presta.infrastructure.web.controllers.assignment;
 
 import com.presta.application.usecases.AssignmentUseCase;
 import com.presta.domain.model.Assignment;
-import com.presta.domain.port.out.AssignmentPort;
+import com.presta.domain.port.AssignmentPort;
 import com.presta.infrastructure.web.dtos.assignment.CreateAssignmentRequest;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatusCode;

@@ -1,23 +1,16 @@
 package com.presta.infrastructure.web.controllers.user;
 
 import com.presta.domain.model.User;
-import com.presta.domain.model.valueobject.KeycloakUserId;
-import com.presta.domain.port.in.UserSyncPort;
-import com.presta.domain.port.out.UserAuthenticationPort;
+import com.presta.domain.port.UserSyncPort;
+import com.presta.domain.port.UserAuthenticationPort;
 import com.presta.infrastructure.external.keycloak.KeycloakAdminClient;
 import com.presta.infrastructure.persistence.adapters.UserRepositoryAdapter;
-import com.presta.infrastructure.persistence.mapper.user.UserMapper;
-import com.presta.infrastructure.web.dtos.user.MeDto;
+import com.presta.infrastructure.persistence.mapper.UserMapper;
 import com.presta.infrastructure.web.dtos.user.UpdateUserDto;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 

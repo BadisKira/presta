@@ -7,10 +7,7 @@ import com.presta.domain.exception.SlotNotAvailableException;
 import com.presta.domain.exception.UnauthorizedAppointmentActionException;
 import com.presta.domain.model.Appointment;
 import com.presta.domain.model.valueobject.AppointmentStatus;
-import com.presta.domain.port.in.appointment.AppointmentQueryPort;
-import com.presta.domain.port.out.ClientRepositoryPort;
-import com.presta.domain.port.out.ContractorRepositoryPort;
-import com.presta.domain.port.out.*;
+import com.presta.domain.port.*;
 import com.presta.domain.model.valueobject.TimeSlot;
 
 import org.springframework.stereotype.Component;
@@ -73,6 +70,7 @@ public class AppointmentUseCase implements AppointmentQueryPort  {
 
         // 5. Créer le rendez-vous
         Appointment appointment = Appointment.create(
+                null,
                 query.clientId(),
                 query.contractorId(),
                 query.startDateTime(),

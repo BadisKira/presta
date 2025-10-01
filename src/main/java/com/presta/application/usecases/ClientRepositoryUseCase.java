@@ -1,9 +1,8 @@
 package com.presta.application.usecases;
 
 import com.presta.domain.model.Client;
-import com.presta.domain.model.Contractor;
-import com.presta.domain.port.out.ClientRepositoryPort;
-import com.presta.domain.port.out.UserRepositoryPort;
+import com.presta.domain.port.ClientRepositoryPort;
+import com.presta.domain.port.UserRepositoryPort;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;

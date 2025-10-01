@@ -3,7 +3,7 @@ package com.presta.infrastructure.external.keycloak;
 import com.presta.domain.model.valueobject.KeycloakUserId;
 import com.presta.domain.model.valueobject.UserProfile;
 import com.presta.domain.model.valueobject.ContactInfo;
-import com.presta.domain.port.out.UserAuthenticationPort;
+import com.presta.domain.port.UserAuthenticationPort;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Component;
 
