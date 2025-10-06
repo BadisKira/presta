@@ -1,8 +1,10 @@
 import { inject, Injectable } from '@angular/core';
-import Keycloak from 'keycloak-js';
+import Keycloak, { KeycloakProfile } from 'keycloak-js';
 import { UserProfile } from '../../models/user.model';
 import { HttpClient } from '@angular/common/http';
 import { MessageService } from 'primeng/api';
+import { Router } from '@angular/router';
+import { catchError, Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -12,7 +14,8 @@ export class KeycloakService {
   private _keycloak: Keycloak | undefined;
   private http = inject(HttpClient);
   private _urlSyncUser = "http://localhost:8080/api/users/sync";
-  private messageService = inject(MessageService)
+  private messageService = inject(MessageService);
+  private router = inject(Router);
 
 
   get keycloak() {
@@ -34,13 +37,34 @@ export class KeycloakService {
   }
 
   async init() {
+    this.keycloak.onAuthSuccess = async () => {
+
+      console.log("Suis je ici ? ");
+      console.log(this.getRoles());
+      if (this.getRoles().includes('ADMIN')) {
+        //localStorage.setItem('role', 'ADMIN');
+        //localStorage.setItem('userSynced', 'true');
+        return;
+      }
+      if (!localStorage.getItem('userSynced')
+        && !this.getRoles().includes('CONTRACTOR')
+        && !this.getRoles().includes('CLIENT')) {
+        this.syncUserWithBackend();
+        //localStorage.setItem('userSynced', 'true');
+        return;
+      }
+    };
+
+    this.keycloak.onAuthError = (err) => console.error('Auth error', err);
+
+    this.keycloak.onAuthLogout = () => {
+      localStorage.removeItem('userSynced');
+    };
+
     const authenticated = await this.keycloak.init({
       onLoad: 'check-sso',
-      //silentCheckSsoRedirectUri:window.location.origin + '/assets/silent-check-sso.html',
+      pkceMethod: 'S256',
       checkLoginIframe: false,
-      // Stockage du token en localeStorage je sais pas si c'est une bonne idée 
-      token: localStorage.getItem("kc_token") || undefined,
-      refreshToken: localStorage.getItem("kc_refreshToken") || undefined,
     });
 
     if (authenticated) {
@@ -49,13 +73,24 @@ export class KeycloakService {
     }
   }
 
-  async login() {
-    await this.keycloak.login();
+
+  register() {
+    return this.keycloak.register({
+      redirectUri: window.location.origin,
+      scope: 'openid profile email'
+    });
+  }
+
+  login() {
+    return this.keycloak.login({
+      redirectUri: window.location.origin,
+      scope: 'openid profile email'
+    });
   }
 
   logout() {
-    localStorage.removeItem("userSynced");
-    return this.keycloak.logout({ redirectUri: 'http://localhost:4200' })
+    localStorage.removeItem('userSynced');
+    return this.keycloak.logout({ redirectUri: window.location.origin });
   }
 
   isLoggedIn(): boolean {
@@ -68,9 +103,14 @@ export class KeycloakService {
     return roles.includes(role);
   }
 
+  getRoles(): string[] {
+    return this.keycloak.tokenParsed?.realm_access?.roles || [];
+  }
+
 
 
   async syncUserWithBackend(): Promise<boolean> {
+    console.log(this.keycloak.token)
     if (!this.keycloak.token || localStorage.getItem("userSynced")) {
       return false;
     }
@@ -82,30 +122,30 @@ export class KeycloakService {
       tentative++;
 
       try {
-        const response = await this.http.get(this._urlSyncUser + `?role=${localStorage.getItem("role")}`, {
+        await this.http.get(this._urlSyncUser + `?role=${localStorage.getItem("role")}`, {
           responseType: 'text'
         }).toPromise();
 
-
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Synchronisation réussie',
-          detail: response
-        });
-
+        localStorage.removeItem('role');
         return true;
 
-      } catch (error: any) {
+      } catch (error) {
         if (tentative === maxTentatives) {
           this.handleSyncError(error);
           return false;
         }
+
         const delai = tentative * 1000;
         await this.wait(delai);
       }
     }
 
+
     return false;
+  }
+
+  getUserInfo(): Promise<KeycloakProfile> {
+    return this.keycloak.loadUserProfile()
   }
 
   /**

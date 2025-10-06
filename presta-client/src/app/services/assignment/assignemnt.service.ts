@@ -3,12 +3,8 @@ import { inject, Injectable } from '@angular/core';
 import { Assignment, AssignmentSearchParams } from '../../models/assignment';
 import { environment } from '../../../environment';
 import { MessageService } from 'primeng/api';
-import { catchError, Observable, of, tap } from 'rxjs';
+import { catchError, map, Observable, of, tap } from 'rxjs';
 import { PagedResponse } from '../../models/pagination.model';
-
-
-
-
 
 
 @Injectable({
@@ -20,24 +16,33 @@ export class AssignemntService {
   private messageService = inject(MessageService)
 
   listAssignements(): Observable<Assignment[]> {
-    return this.http.get<Assignment[]>(this._url_base).pipe(
-      tap(data => data),
-      catchError(error => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Erreur service',
-          detail: "Erreur lors de la récupération des services"
-        });
-        return of([]);
-      })
-    );
+
+    let params = new HttpParams();
+    params = params.set('page', "0");
+    params = params.set('size', "1000");
+    params = params.set('sortBy', "name");
+    params = params.set('sortDirection', "asc");  
+      
+
+  
+    return this.http.get<PagedResponse<Assignment>>(this._url_base, { params }).pipe(
+    map(res => res.content ?? []),
+    catchError(error => {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Erreur service',
+        detail: 'Erreur lors de la récupération des services'
+      });
+      return of([] as Assignment[]);
+    })
+  );
   }
 
-  saveAssignment(assignemnt:Assignment) {
-    return this.http.post<Assignment>(this._url_base,{
+  saveAssignment(assignemnt: Assignment) {
+    return this.http.post<Assignment>(this._url_base, {
       ...assignemnt
     }).pipe(
-       catchError(error => {
+      catchError(error => {
         this.messageService.add({
           severity: 'error',
           summary: 'Erreur service',
@@ -50,11 +55,11 @@ export class AssignemntService {
 
 
 
-  updateAssignment(assignemnt:Assignment) {
-    return this.http.put<Assignment>(this._url_base,{
+  updateAssignment(assignemnt: Assignment) {
+    return this.http.put<Assignment>(this._url_base, {
       ...assignemnt
     }).pipe(
-       catchError(error => {
+      catchError(error => {
         this.messageService.add({
           severity: 'error',
           summary: 'Erreur service',
@@ -65,22 +70,22 @@ export class AssignemntService {
     )
   }
 
-  
+
   deleteAssignment(assignmentId: string) {
     return this.http.delete<Assignment>(this._url_base + `/${assignmentId}`).pipe(
-        catchError(error => {
-            this.messageService.add({
-                severity: 'error',
-                summary: 'Erreur service',
-                detail: "Erreur lors de la suppression du service"
-            });
-            return of(); 
-        })
+      catchError(error => {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Erreur service',
+          detail: "Erreur lors de la suppression du service"
+        });
+        return of();
+      })
     );
-}
+  }
 
 
-getAssignments(params?: AssignmentSearchParams): Observable<PagedResponse<Assignment>> {
+  getAssignments(params?: AssignmentSearchParams): Observable<PagedResponse<Assignment>> {
     let httpParams = new HttpParams();
 
     if (params) {
@@ -103,7 +108,6 @@ getAssignments(params?: AssignmentSearchParams): Observable<PagedResponse<Assign
 
     return this.http.get<PagedResponse<Assignment>>(this._url_base, { params: httpParams }).pipe(
       catchError(error => {
-        console.log(error);
         this.messageService.add({
           severity: 'error',
           summary: 'Erreur service',

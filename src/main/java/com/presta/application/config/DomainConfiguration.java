@@ -1,24 +1,26 @@
 package com.presta.application.config;
 
 
-import com.presta.domain.exception.DomainException;
-import com.presta.domain.port.in.UserProfilePort;
-import com.presta.domain.port.in.UserRegistrationPort;
-import com.presta.domain.port.in.UserSyncPort;
-import com.presta.domain.port.out.UserRepositoryPort;
+import com.presta.domain.service.AppointmentDomainService;
+import com.presta.domain.service.ContractorScheduleService;
+import com.presta.application.usecases.SchedulingUseCase;
+import com.presta.domain.port.UserProfilePort;
+import com.presta.domain.port.UserRepositoryPort;
+import com.presta.domain.port.UserSyncPort;
 import com.presta.domain.service.UserProfileDomainService;
-import com.presta.domain.service.UserRegistrationDomainService;
 import com.presta.domain.service.UserSyncDomainService;
+import com.presta.infrastructure.persistence.adapters.UserRepositoryAdapter;
+import com.presta.infrastructure.persistence.adapters.UnavailabilityRepositoryAdapter;
+import com.presta.infrastructure.persistence.mapper.AvailabilityRuleMapper;
+import com.presta.infrastructure.persistence.mapper.UnavailabilityRuleMapper;
+import com.presta.infrastructure.persistence.repositories.JpaAppointmentRepository;
+import com.presta.infrastructure.persistence.repositories.JpaAvailabilityRuleRepository;
+import com.presta.infrastructure.persistence.repositories.JpaContractorRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class DomainConfiguration {
-    @Bean
-    public UserRegistrationPort userRegistrationService(UserRepositoryPort userRepositoryPort) {
-        return new UserRegistrationDomainService(userRepositoryPort);
-    }
-
     @Bean
     public UserProfilePort userProfileService(UserRepositoryPort userRepositoryPort) {
         return new UserProfileDomainService(userRepositoryPort);
@@ -30,4 +32,39 @@ public class DomainConfiguration {
     }
 
 
+    @Bean
+    public ContractorScheduleService scheduleService(){
+        return  new ContractorScheduleService();
+    }
+
+   @Bean
+    public SchedulingUseCase schedulingUseCase(
+            JpaAppointmentRepository jpaAppointmentRepository,
+            JpaAvailabilityRuleRepository jpaAvailabilityRuleRepository,
+            UnavailabilityRepositoryAdapter unavailabilityRepositoryAdapter,
+            UnavailabilityRuleMapper unavailabilityRuleMapper,
+            JpaContractorRepository jpaContractorRepository,
+            ContractorScheduleService contractorScheduleService,
+            AvailabilityRuleMapper availabilityRuleMapper,
+            UserRepositoryAdapter userRepositoryAdapter
+    ) {
+
+        return new  SchedulingUseCase(
+                 jpaAppointmentRepository,
+                 jpaAvailabilityRuleRepository,
+                unavailabilityRepositoryAdapter,
+                 jpaContractorRepository,
+                 contractorScheduleService,
+                 availabilityRuleMapper,
+                 userRepositoryAdapter,
+                unavailabilityRuleMapper) ;
+
+    }
+
+
+    @Bean
+    public AppointmentDomainService appointmentDomainService(){
+        return new  AppointmentDomainService();
+    }
 }
+

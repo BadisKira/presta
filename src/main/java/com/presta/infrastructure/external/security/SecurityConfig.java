@@ -3,6 +3,7 @@ package com.presta.infrastructure.external.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -18,6 +19,7 @@ import java.util.List;
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity(securedEnabled = true)
+@Profile("!test")
 public class SecurityConfig {
 
         private static final String[] PERMITTED_ENDPOINTS = {
@@ -31,7 +33,8 @@ public class SecurityConfig {
                 "/v*/api-docs*",
                 "/swagger-ui.html",
                 "/swagger-ui/**",
-                "/api/assignments/**"
+                "/api/assignments/**",
+                "/api/*"
         };
 
 

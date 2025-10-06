@@ -6,36 +6,61 @@ export const routes: Routes = [
     {
         path: '',
         loadComponent: () => import('./pages/landing/landing').then(m => m.LandingPage),
-        //loadComponent: () => import('./pages/admin/admin').then(m => m.AdminPage),
-
     },
-
-    // Routes protégées
-    // {
-    //     path: 'dashboard',
-    //     loadComponent: () => import('./pages/landing/landing').then(m => m.LandingPage),
-    //     canActivate: [authGuard]
-    // },
+    {
+        path: 'search',
+        loadComponent: () => import('./pages/contractor/contractor-search/contractor-search').then(m => m.ContractorSearchPage),
+    },
     {
         path: 'admin',
         loadComponent: () => import('./pages/admin/admin').then(m => m.AdminLayout),
         // canActivate: [authGuard],
         // data: { roles: ['ADMIN'] },
-        children:[
-            {   
-                path:'service', 
-                loadComponent:() => import('./pages/admin/service.page/service.page').then(m =>m.ServicePage)
+        children: [
+            {
+                path: 'service',
+                loadComponent: () => import('./pages/admin/service.page/service.page').then(m => m.ServicePage)
             },
-             {   
-                path:'client', 
-                loadComponent:() => import('./pages/admin/client.page/client.page').then(m =>m.ClientPage)
+            {
+                path: 'client',
+                loadComponent: () => import('./pages/admin/client.page/client.page').then(m => m.ClientPage)
+            },
+             {
+                path: 'contractor',
+                loadComponent: () => import('./pages/admin/contractor.page/contractor.page').then(m => m.ContractorPage)
             }
         ]
     },
+    {
+        path: 'contractor',
+        loadComponent: () => import('./pages/contractor/contractor').then(m => m.ContractorLayout),
+        //canActivate: [authGuard],
+        children: [
+            {
+                path: 'complete-profile',
+                loadComponent: () => import('./pages/contractor/contractor-fill-information/contractor-fill-information').then(m => m.ContractorFillInformation)
+            } , //ProfilePage
+            {
+                path: 'profile',
+                loadComponent: () => import('./pages/contractor/profile.page/profile.page').then(m => m.ProfilePage)
+            } 
+        ]
+    },
+    {
+        path: 'client',
+        loadComponent: () => import('./pages/client/client').then(m => m.ClientLayout),
+        canActivate: [authGuard],
+        children: [
+
+        ]
+    },
+
+    { path: 'unauthorized', loadComponent: () => import('./pages/unauthorized/unauthorized').then(m => m.UnauthorizedPage) },
+    { path: 'notfound', loadComponent: () => import('./pages/notfound/notfound').then(m => m.NotfoundPage) },
+
 
     //{ path: 'notfound', component: Notfound },
-    { path: '**', redirectTo: '/notfound' }
-    // { path: 'unauthorized', loadComponent: () => import('./unauthorized/unauthorized.component').then(m => m.UnauthorizedComponent) },
+    { path: '**', redirectTo: '/notfound' },
 
 ];
 

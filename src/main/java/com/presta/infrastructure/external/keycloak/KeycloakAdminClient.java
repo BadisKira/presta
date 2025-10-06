@@ -61,8 +61,6 @@ public class KeycloakAdminClient {
                 .toRepresentation();
 
         userResource.roles().realmLevel().add(Collections.singletonList(role));
-
-        System.out.println("🎭 Rôle " + roleName + " attribué à userId=" + userId);
     }
 
 

@@ -1,7 +1,7 @@
 import { Assignment } from "./assignment";
 import { User } from "./user.model";
 
-export interface ContractorDto {
+export interface Contractor {
   id: string;
   fullName: string;
   address: string;
@@ -11,8 +11,8 @@ export interface ContractorDto {
 }
 
 export interface UpdateContractorRequest {
-  address?: string;
-  assignmentId?: string;
+  address: string;
+  assignmentId: string;
   speciality?: string;
 }
 

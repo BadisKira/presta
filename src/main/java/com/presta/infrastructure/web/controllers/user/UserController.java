@@ -1,16 +1,16 @@
 package com.presta.infrastructure.web.controllers.user;
 
 import com.presta.domain.model.User;
-import com.presta.domain.port.in.UserSyncPort;
-import com.presta.domain.port.out.UserAuthenticationPort;
+import com.presta.domain.port.UserSyncPort;
+import com.presta.domain.port.UserAuthenticationPort;
 import com.presta.infrastructure.external.keycloak.KeycloakAdminClient;
 import com.presta.infrastructure.persistence.adapters.UserRepositoryAdapter;
+import com.presta.infrastructure.persistence.mapper.UserMapper;
 import com.presta.infrastructure.web.dtos.user.UpdateUserDto;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -22,19 +22,21 @@ public class UserController {
     private final UserAuthenticationPort authPort;
     private final KeycloakAdminClient keycloakAdminClient;
     private final UserRepositoryAdapter userRepositoryAdapter;
+    private final UserMapper userMapper ;
 
     public UserController(UserSyncPort userSyncPort,
                           UserAuthenticationPort authPort,
-                          KeycloakAdminClient keycloakAdminClient, UserRepositoryAdapter userRepositoryAdapter) {
+                          KeycloakAdminClient keycloakAdminClient, UserRepositoryAdapter userRepositoryAdapter, UserMapper userMapper) {
         this.userSyncPort = userSyncPort;
         this.authPort = authPort;
         this.keycloakAdminClient = keycloakAdminClient;
         this.userRepositoryAdapter = userRepositoryAdapter;
+        this.userMapper = userMapper;
     }
 
     @GetMapping("/sync")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<String> syncUsers(@RequestParam  String role) {
+    public ResponseEntity<String> syncUsers(@RequestParam("role")  String role) {
          var authUser = authPort.getCurrentAuthenticatedUser()
                 .orElseThrow(() -> new SecurityException("Not authenticated"));
 
@@ -44,28 +46,13 @@ public class UserController {
                 authUser.keycloakId(),
                 authUser.profile(),
                 authUser.contact(),
-                List.of(role.equals("CLIENT") ? UserSyncPort.UserRole.CLIENT : UserSyncPort.UserRole.CONTRACTOR)
-        );
-
+                role.equals("CLIENT") ? UserSyncPort.UserRole.CLIENT : UserSyncPort.UserRole.CONTRACTOR);
         return ResponseEntity.ok("Sync completed for user: " + authUser.keycloakId());
     }
 
 
-    @GetMapping("/me")
-    @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<Object> getMe() {
-        var authUser = authPort.getCurrentAuthenticatedUser()
-                .orElseThrow(() -> new SecurityException("Not authenticated"));
 
-        return ResponseEntity.ok(Map.of(
-                "keycloakId", authUser.keycloakId().toString(),
-                "profile", authUser.profile(),
-                "contact", authUser.contact(),
-                "roles", authUser.roles()
-        ));
-    }
 
-    // ✅ Ajouter un rôle à un utilisateur
     @PostMapping("/{username}/roles")
     //@PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> assignRole(@PathVariable String id,

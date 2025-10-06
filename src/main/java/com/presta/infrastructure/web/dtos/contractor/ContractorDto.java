@@ -1,6 +1,7 @@
 package com.presta.infrastructure.web.dtos.contractor;
 import com.presta.domain.model.Assignment;
 import com.presta.domain.model.Contractor;
+import com.presta.infrastructure.web.dtos.user.MeDto;
 import com.presta.infrastructure.web.dtos.user.UserDto;
 
 import java.util.UUID;
@@ -12,9 +13,9 @@ public record ContractorDto(
         Assignment assignment,
         String speciality,
         UserDto user
-) {
+) implements MeDto {
 
-    public static ContractorDto fromDomain(Contractor contractor) {
+    public static ContractorDto fromDomain(Contractor contractor)  {
         return new ContractorDto(
                 contractor.id(),
                 contractor.fullName(),
